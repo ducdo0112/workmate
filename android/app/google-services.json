@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "179581822901",
+    "firebase_url": "https://workmate-c3a66-default-rtdb.firebaseio.com",
+    "project_id": "workmate-c3a66",
+    "storage_bucket": "workmate-c3a66.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:179581822901:android:bc2f6ff5395fee4fad9bfc",
+        "android_client_info": {
+          "package_name": "com.vn.workmate"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD43oZec5COkYQvyufQNrGIPFzhYvAFPAA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

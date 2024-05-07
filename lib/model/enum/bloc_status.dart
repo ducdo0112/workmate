@@ -1,0 +1,16 @@
+enum BlocStatus {
+  initial,
+  loading,
+  success,
+  loadMore,
+  noInternetError,
+  error,
+  forceUpdate,
+  forceLogout,
+  maintenance,
+  error400,
+  error401,
+  error403,
+  error500,
+  error700,
+}
