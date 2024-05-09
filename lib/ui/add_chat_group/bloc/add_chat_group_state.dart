@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:workmate/common/bloc/base_state.dart';
 import 'package:workmate/model/enum/bloc_status.dart';
 import 'package:workmate/model/http_raw/network_exception.dart';
@@ -14,9 +16,14 @@ class AddChatGroupState extends BaseState {
   final String avatarAdmin;
   final String emailAdmin;
   final String usernameAdmin;
+  final bool isAdmin;
 
   final BlocStatus statusCreateGroup;
   final BlocStatus statusCreatePrivateGroup;
+
+  final String username1;
+  final String username2;
+  final bool isPrivateGroup;
 
   const AddChatGroupState({
     BlocStatus status = BlocStatus.initial,
@@ -32,6 +39,10 @@ class AddChatGroupState extends BaseState {
     this.usernameAdmin = '',
     this.statusCreateGroup = BlocStatus.initial,
     this.statusCreatePrivateGroup = BlocStatus.initial,
+    this.username1 = '',
+    this.username2 = '',
+    this.isPrivateGroup = false,
+    this.isAdmin = false,
   }) : super(status: status, exception: exception);
 
   AddChatGroupState copyWith({
@@ -48,6 +59,10 @@ class AddChatGroupState extends BaseState {
     String? avatarAdmin,
     String? emailAdmin,
     String? usernameAdmin,
+    String? username1,
+    String? username2,
+    bool? isPrivateGroup,
+    bool? isAdmin,
   }) =>
       AddChatGroupState(
         status: status ?? this.status,
@@ -65,6 +80,10 @@ class AddChatGroupState extends BaseState {
         avatarAdmin: avatarAdmin ?? this.avatarAdmin,
         emailAdmin: emailAdmin ?? this.emailAdmin,
         usernameAdmin: usernameAdmin ?? this.usernameAdmin,
+        username1: username1 ?? this.username1,
+        username2: username2 ?? this.username2,
+        isPrivateGroup: isPrivateGroup ?? this.isPrivateGroup,
+        isAdmin: isAdmin ?? this.isAdmin,
       );
 
   @override
@@ -80,6 +99,10 @@ class AddChatGroupState extends BaseState {
       emailAdmin,
       usernameAdmin,
       statusCreateGroup,
-      statusCreatePrivateGroup
+      statusCreatePrivateGroup,
+      username1,
+      username2,
+      isPrivateGroup,
+      isAdmin
     ]);
 }

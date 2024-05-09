@@ -54,6 +54,12 @@ class AccountInfoState extends BaseState {
         user?.fullName != userAfterModify?.fullName);
   }
 
+  bool hasStatusChanged() {
+    return (user != null &&
+        userAfterModify != null &&
+        user?.status != userAfterModify?.status);
+  }
+
   String getAvatarForDisplay() {
     if (userAfterModify != null &&
         (userAfterModify?.profilePic.isNotEmpty ?? false) &&

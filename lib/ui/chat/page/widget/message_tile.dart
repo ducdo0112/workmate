@@ -11,6 +11,7 @@ class MessageTile extends StatefulWidget {
   final String avatar;
   final String email;
   final bool isSameSenderBefore;
+  final String status;
 
   const MessageTile({
     Key? key,
@@ -20,6 +21,7 @@ class MessageTile extends StatefulWidget {
     required this.avatar,
     required this.email,
     required this.isSameSenderBefore,
+    required this.status,
   }) : super(key: key);
 
   @override
@@ -59,14 +61,21 @@ class _MessageTileState extends State<MessageTile> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              widget.sender.toUpperCase(),
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: -0.5),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  widget.sender.toUpperCase(),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: -0.5),
+                ),
+                SizedBox(width: 4,),
+                widget.status == "Online" ? Icon(Icons.online_prediction, color: Colors.green,) : Icon(Icons.remove_circle_outline, color: Colors.grey,)
+              ],
             ),
             const SizedBox(
               height: 8,

@@ -23,7 +23,6 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       onCallApi: () async {
         emit(state.copyWith(status: BlocStatus.loading));
         final groups = await fireStoreRepository.getAllGroup();
-        print("dongnd1");
       },
       onError: (e) {
         emit(state.copyWith(status: BlocStatus.error));

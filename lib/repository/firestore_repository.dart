@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:workmate/model/group/group.dart';
 import 'package:workmate/model/user/user_info_data.dart';
 
@@ -14,15 +16,18 @@ class FireStoreRepository {
       "fullName": fullname,
       "email": email,
       "groups": [],
+      "statusReadMessages": [],
       "profilePic": "",
       "uid": uid,
+      "status": "Online"
     });
   }
 
-  Future updateUserdata(String fullname, String profilePic) async{
+  Future updateUserdata(String fullname, String profilePic, String status) async{
     return await userCollection.doc(uid).update({
       "fullName": fullname,
       "profilePic": profilePic,
+      "status": status
     });
   }
 
@@ -48,14 +53,12 @@ class FireStoreRepository {
     return allData;
   }
 
-  Future<List<Group>> getGroup (String groupId) async {
-    // Get docs from collection reference
-    QuerySnapshot querySnapshot = await groupCollection.where("groupId", isEqualTo: groupId).get();
+  Future getGroup(String groupId) async {
+    return groupCollection.doc("").snapshots();
+  }
 
-    // Get data from docs and convert map to List
-    final allData = querySnapshot.docs.map((doc) => Group.fromJson((doc.data() as Map<String, dynamic>))).toList();
-
-    return allData;
+  CollectionReference<Object?> getUserStream() {
+    return userCollection;
   }
   
   // getting user data
@@ -66,6 +69,11 @@ class FireStoreRepository {
   // get user groups
   getUserGroups() async {
     return userCollection.doc(uid).snapshots();
+  }
+
+  test(String uid) async {
+    return CombineLatestStream.list([userCollection.doc(uid).snapshots(), groupCollection.doc().collection("messages").orderBy("time").snapshots()]);
+
   }
   // creating a group
   Future<String> createGroup(String userName, String id, String groupName, List<String> uuidMembers,List<String> memberNames ) async {
@@ -191,6 +199,27 @@ class FireStoreRepository {
       });
     }
   }
+  
+  Future exitGroupWithRoleMember(String groupId,String groupName, String userName) async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    DocumentReference userDocumentReference = userCollection.doc(uid);
+    DocumentReference groupDocumentReference = groupCollection.doc(groupId);
+    DocumentSnapshot documentSnapshot = await userDocumentReference.get();
+    List<dynamic> groups = await documentSnapshot['groups'];
+    if(groups.contains("${groupId}_$groupName")) {
+      await userDocumentReference.update({
+        "groups":FieldValue.arrayRemove(["${groupId}_$groupName"])
+      });
+      await groupDocumentReference.update({
+        "members":FieldValue.arrayRemove(["${uid}_$userName"])
+      });
+    }
+  }
+  
+  Future exitGroupWithRoleAdmin() async {
+    
+  }
+  
   // send message
   sendMessage(String groupId, Map<String, dynamic> chatMessageData) async {
     groupCollection.doc(groupId).collection("messages").add(chatMessageData);
@@ -199,5 +228,33 @@ class FireStoreRepository {
       "recentMessageSender":chatMessageData['sender'],
       "recentMessageTime":chatMessageData['time'].toString(),
     });
+
+    // update group in collection user thanhf chua do
+    List<UserInfoData> allUser = await getAllUser();
+    if(allUser.isNotEmpty) {
+      for(UserInfoData user in allUser) {
+        DocumentReference userDocumentRefence = userCollection.doc(user.uid);
+        DocumentSnapshot documentSnapshot = await userDocumentRefence.get();
+        // removed await here check once
+        List<dynamic> statusReadMessages = await documentSnapshot["statusReadMessages"];
+        if(!statusReadMessages.contains("${groupId}")) {
+          await userDocumentRefence.update({
+            "statusReadMessages":FieldValue.arrayUnion(["${groupId}"])
+          });
+        }
+      }
+    }
+  }
+
+  updateStatusMessageToRead(String groupId) async {
+    DocumentReference userDocumentRefence = userCollection.doc(FirebaseAuth.instance.currentUser!.uid);
+    DocumentSnapshot documentSnapshot = await userDocumentRefence.get();
+    // removed await here check once
+    List<dynamic> statusReadMessages = await documentSnapshot["statusReadMessages"];
+    if(statusReadMessages.contains("${groupId}")) {
+      await userDocumentRefence.update({
+        "statusReadMessages":FieldValue.arrayRemove(["${groupId}"])
+      });
+    }
   }
 }

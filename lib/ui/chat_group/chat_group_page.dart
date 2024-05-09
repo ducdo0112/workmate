@@ -6,12 +6,18 @@ import 'package:workmate/common/color/app_color.dart';
 import 'package:workmate/repository/firestore_repository.dart';
 import 'package:workmate/ui/chat/page/widget/message_tile.dart';
 
+import '../../model/user/user_info_data.dart';
+
 class ChatGroupPage extends StatefulWidget {
   final String groupId;
   final String groupName;
   final String userName;
   final String avatar;
   final String email;
+  final bool isPrivateGroup;
+  final String username1;
+  final String username2;
+  final bool isAdmin;
 
   const ChatGroupPage({
     Key? key,
@@ -20,6 +26,10 @@ class ChatGroupPage extends StatefulWidget {
     required this.groupName,
     required this.avatar,
     required this.email,
+    required this.isPrivateGroup,
+    required this.username1,
+    required this.username2,
+    required this.isAdmin,
   }) : super(key: key);
 
   @override
@@ -31,21 +41,12 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
   TextEditingController messaagesController = TextEditingController();
   String admin = "";
   final ScrollController _scrollController = ScrollController();
+  List<UserInfoData>? listUserInfoData;
 
   @override
   void initState() {
     super.initState();
     getChatandAdmin();
-
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   if (_scrollController.hasClients) {
-    //     _scrollController.animateTo(
-    //       _scrollController.position.maxScrollExtent,
-    //       curve: Curves.easeOut,
-    //       duration: const Duration(milliseconds: 500),
-    //     );
-    //   }
-    // });
   }
 
   getChatandAdmin() async {
@@ -62,22 +63,29 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
         admin = adminResult;
       });
     }
+
+    FireStoreRepository().getUserStream().snapshots().listen((event) async {
+      final listUserChange = await FireStoreRepository().getAllUser();
+      // setState(() {
+      //   listUserInfoData = listUserChange;
+      // });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    _scrollToBottom(2);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         elevation: 0,
-        title: Text(widget.groupName),
+        title: Text(_getTitle()),
         backgroundColor: AppColor.orangePeel,
         actions: [
-          IconButton(
-              onPressed: () {
-                // nextScreen(context, GroupInfo(groupId: widget.groupId, groupName: widget.groupName, adminName: admin,));
-              },
-              icon: const Icon(Icons.info_outline))
+          Visibility(
+              visible: !widget.isPrivateGroup,
+              child: _buildButtonExitGroup(
+                  context, widget.groupId, widget.groupName, widget.userName))
         ],
       ),
       body: Column(
@@ -98,18 +106,24 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                 width: MediaQuery.of(context).size.width,
-                color: AppColor.grayX11,
                 child: Row(
                   children: [
                     Expanded(
                         child: TextFormField(
                       controller: messaagesController,
-                      style: const TextStyle(color: Colors.white),
                       decoration: const InputDecoration(
-                        hintText: "Vui lòng nhập",
-                        hintStyle: TextStyle(color: Colors.white, fontSize: 16),
-                        border: InputBorder.none,
+                        labelText: "Nhập tin nhắn",
+                        labelStyle: TextStyle(color: AppColor.orangePeel),
+                        contentPadding: EdgeInsets.zero,
+                        focusColor: Colors.white,
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: AppColor.orangePeel),
+                        ),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: AppColor.orangePeel),
+                        ),
                       ),
+                      cursorColor: AppColor.orangePeel,
                     )),
                     const SizedBox(
                       width: 12,
@@ -117,7 +131,7 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
                     GestureDetector(
                       onTap: () {
                         sendMessage();
-                        _scrollToBottom();
+                        _scrollToBottom(1);
                       },
                       child: Container(
                         height: 50,
@@ -143,6 +157,34 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
     );
   }
 
+  _buildButtonExitGroup(
+      BuildContext context, String groupId, String groupName, String userName) {
+    return IconButton(
+        onPressed: () {
+          _processExitGroupChat(context, groupId, groupName, userName);
+        },
+        icon: const Icon(Icons.exit_to_app));
+  }
+
+  _processExitGroupChat(BuildContext context, String groupId, String groupName,
+      String userName) async {
+    if (!widget.isAdmin) {
+      await FireStoreRepository()
+          .exitGroupWithRoleMember(groupId, groupName, userName);
+      Navigator.of(context).pop();
+    }
+  }
+
+  _getTitle() {
+    if (!widget.isPrivateGroup) {
+      return widget.groupName;
+    } else {
+      return widget.userName == widget.username1
+          ? widget.username2
+          : widget.username1;
+    }
+  }
+
   chatMessages() {
     return StreamBuilder(
       builder: (context, AsyncSnapshot snapshot) {
@@ -156,10 +198,10 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
           physics: const BouncingScrollPhysics(),
           itemCount: snapshot.data.docs.length,
           itemBuilder: (context, index) {
-            print("dongnd1 message: ${data[index]['message']}, index: $index");
             var isSameSenderBefore = false;
-            if(index > 0) {
-              isSameSenderBefore = data[index]['email'] == data[index-1]['email'];
+            if (index > 0) {
+              isSameSenderBefore =
+                  data[index]['email'] == data[index - 1]['email'];
             }
             return MessageTile(
               message: data[index]['message'],
@@ -168,12 +210,25 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
               avatar: data[index]['avatar'],
               isSameSenderBefore: isSameSenderBefore,
               email: data[index]['email'],
+              status: getStatusUser(data[index]['email']),
             );
           },
         );
       },
       stream: chats,
     );
+  }
+
+  getStatusUser(String email) {
+    if (listUserInfoData != null) {
+      final mappingResult = listUserInfoData
+          ?.firstWhere((element) => element.email == email, orElse: null);
+      if (mappingResult != null) {
+        return mappingResult.status;
+      }
+    }
+
+    return "Online";
   }
 
   sendMessage() {
@@ -192,10 +247,15 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
     }
   }
 
-  _scrollToBottom() {
-    Timer(
-        const Duration(seconds: 1),
-        () => _scrollController
-            .jumpTo(_scrollController.position.minScrollExtent));
+  _scrollToBottom(int seconds) {
+    Timer(Duration(seconds: seconds), () {
+      if(_scrollController.hasClients) {
+        _scrollController.jumpTo(_scrollController.position.minScrollExtent);
+      }
+
+
+      // update status read
+      FireStoreRepository().updateStatusMessageToRead(widget.groupId);
+    });
   }
 }

@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:workmate/common/bloc/bloc_builder_creation.dart';
 import 'package:workmate/common/bloc/bloc_consumer_creation.dart';
 import 'package:workmate/common/color/app_color.dart';
 import 'package:workmate/common/widget/base_page.dart';
@@ -69,6 +68,10 @@ class AddChatGroupPage extends StatelessWidget {
                   userName: p1.usernameAdmin,
                   avatar: p1.avatarAdmin,
                   email: p1.emailAdmin,
+                  isPrivateGroup: p1.isPrivateGroup,
+                  username1: p1.username1,
+                  username2: p1.username2,
+                  isAdmin: p1.isAdmin,
                 ));
             return;
           }
@@ -82,6 +85,10 @@ class AddChatGroupPage extends StatelessWidget {
                   userName: p1.usernameAdmin,
                   avatar: p1.avatarAdmin,
                   email: p1.emailAdmin,
+                  isPrivateGroup: p1.isPrivateGroup,
+                  username1: p1.username1,
+                  username2: p1.username2,
+                    isAdmin: p1.isAdmin
                 ));
           }
 
@@ -152,7 +159,7 @@ class AddChatGroupPage extends StatelessWidget {
               prefixIcon: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: SvgPicture.asset(
-                  AppImages.email,
+                  AppImages.user,
                   colorFilter: const ColorFilter.mode(
                     AppColor.textColorSilver,
                     BlendMode.srcIn,
@@ -251,6 +258,10 @@ class AddChatGroupPage extends StatelessWidget {
                 ),
               );
             }));
+  }
+
+  String getName(String res) {
+    return res.substring(res.indexOf("_") + 1);
   }
 
   _buildRegisterButton(

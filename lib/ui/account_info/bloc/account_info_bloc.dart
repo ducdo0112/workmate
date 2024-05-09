@@ -84,7 +84,8 @@ class AccountInfoBloc extends Bloc<AccountInfoEvent, AccountInfoState> {
         currentUserAfterModify?.fullName ?? '',
         currentUserAfterModify?.email ?? '',
         img64,
-        currentUserAfterModify?.uid ?? '');
+        currentUserAfterModify?.uid ?? '',
+        currentUserAfterModify?.status ?? '');
     emit(state.copyWith(userAfterModify: userAfterModify));
   }
 
@@ -100,7 +101,7 @@ class AccountInfoBloc extends Bloc<AccountInfoEvent, AccountInfoState> {
           emit(state.copyWith(updateStatus: BlocStatus.loading));
           await FireStoreRepository(uid: FirebaseAuth.instance.currentUser!.uid)
               .updateUserdata(state.userAfterModify?.fullName ?? '',
-                  state.userAfterModify?.profilePic ?? '');
+                  state.userAfterModify?.profilePic ?? '', state.userAfterModify?.status ?? 'Online');
 
           emit(state.copyWith(
               updateStatus: BlocStatus.success, user: state.userAfterModify));
@@ -134,7 +135,8 @@ class AccountInfoBloc extends Bloc<AccountInfoEvent, AccountInfoState> {
         event.username ?? '',
         currentUserAfterModify?.email ?? '',
         currentUserAfterModify?.profilePic ?? '',
-        currentUserAfterModify?.uid ?? '');
+        currentUserAfterModify?.uid ?? '',
+        currentUserAfterModify?.status ?? '');
     emit(state.copyWith(userAfterModify: userAfterModify));
   }
 
@@ -156,6 +158,13 @@ class AccountInfoBloc extends Bloc<AccountInfoEvent, AccountInfoState> {
       Emitter<AccountInfoState> emit,
       ) async {
     await SharedPreferencesHelper.setStringType(SharedPreferencesHelper.keyStatus, event.status ?? "Online");
-    emit(state.copyWith(userStatus: event.status));
+    final currentUserAfterModify = state.userAfterModify;
+    final userAfterModify = UserInfoData(
+        currentUserAfterModify?.fullName ?? '',
+        currentUserAfterModify?.email ?? '',
+        currentUserAfterModify?.profilePic ?? '',
+        currentUserAfterModify?.uid ?? '',
+        event.status ?? "Online");
+    emit(state.copyWith(userStatus: event.status, userAfterModify: userAfterModify));
   }
 }

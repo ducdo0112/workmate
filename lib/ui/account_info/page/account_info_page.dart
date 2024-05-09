@@ -280,7 +280,7 @@ class _AccountInfoPageState extends State<AccountInfoPage>
           borderSizeWidth: 1.w,
           circularProgressColor: AppColor.orangePeel,
           backgroundColorEnable: AppColor.white,
-          isEnable: state.hasAvatarChanged() || state.hasNameChanged(),
+          isEnable: state.hasAvatarChanged() || state.hasNameChanged() || state.hasStatusChanged(),
         );
       },
     );

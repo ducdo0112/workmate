@@ -9,15 +9,17 @@ class UserInfoData {
   final String email;
   final String profilePic;
   final String uid;
+  final String status;
 
-  UserInfoData(this.fullName, this.email, this.profilePic, this.uid);
+  UserInfoData(this.fullName, this.email, this.profilePic, this.uid, this.status);
 
   factory UserInfoData.fromQuerySnapshot(QuerySnapshot snapshot) {
     return UserInfoData(
         snapshot.docs[0]['fullName'],
         snapshot.docs[0]['email'],
         snapshot.docs[0]['profilePic'],
-        snapshot.docs[0]['uid']);
+        snapshot.docs[0]['uid'],
+        snapshot.docs[0]['status']);
   }
 
   factory UserInfoData.fromJson(Map<String, dynamic> json) =>

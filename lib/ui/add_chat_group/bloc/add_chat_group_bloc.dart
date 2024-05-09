@@ -93,8 +93,10 @@ class AddChatGroupBloc extends Bloc<AddChatGroupEvent, AddChatGroupState> {
               statusCreateGroup: BlocStatus.success,
               groupId: groupId,
               emailAdmin: email,
+              isAdmin: true,
               avatarAdmin: adminUser.profilePic,
-              usernameAdmin: adminUser.fullName));
+              usernameAdmin: adminUser.fullName,
+              isPrivateGroup: false));
         },
         onError: (e) {
           emit(state.copyWith(statusCreateGroup: BlocStatus.error));
@@ -111,7 +113,9 @@ class AddChatGroupBloc extends Bloc<AddChatGroupEvent, AddChatGroupState> {
       shouldDefaultErrorDialogWhenCallApi: true,
       onNoInternet: (e) {},
       onCallApi: () async {
-        emit(state.copyWith(statusCreatePrivateGroup: BlocStatus.loading));
+        emit(state.copyWith(
+            statusCreatePrivateGroup: BlocStatus.loading,
+            status: BlocStatus.loading));
         final listUuidUser = <String>[];
         final listUserName = <String>[];
 
@@ -137,10 +141,17 @@ class AddChatGroupBloc extends Bloc<AddChatGroupEvent, AddChatGroupState> {
             groupId: groupId,
             emailAdmin: email,
             avatarAdmin: adminUser.profilePic,
-            usernameAdmin: adminUser.fullName));
+            usernameAdmin: adminUser.fullName,
+            status: BlocStatus.success,
+            isPrivateGroup: true,
+            isAdmin: true,
+            username1: adminUser.fullName,
+            username2: otherUser.fullName));
       },
       onError: (e) {
-        emit(state.copyWith(statusCreatePrivateGroup: BlocStatus.error));
+        emit(state.copyWith(
+            statusCreatePrivateGroup: BlocStatus.error,
+            status: BlocStatus.error));
       },
     );
   }

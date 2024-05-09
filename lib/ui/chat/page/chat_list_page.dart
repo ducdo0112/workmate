@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:workmate/common/color/app_color.dart';
 import 'package:workmate/common/widget/base_page.dart';
 import 'package:workmate/main/main_dev.dart';
@@ -31,6 +32,7 @@ class _ChatListPageState extends State<ChatListPage> {
   Stream? groups;
   bool _isLoading = false;
   String groupName = "";
+  Stream? streamData;
 
   @override
   void initState() {
@@ -56,10 +58,13 @@ class _ChatListPageState extends State<ChatListPage> {
       QuerySnapshot userInfoSnapshot =
           await FireStoreRepository(uid: FirebaseAuth.instance.currentUser!.uid)
               .gettingUserData(email);
-      avatarCurrentUser =
-          UserInfoData.fromQuerySnapshot(userInfoSnapshot).profilePic;
+      final currentUser = UserInfoData.fromQuerySnapshot(userInfoSnapshot);
+      avatarCurrentUser = currentUser.profilePic;
       this.email = email;
+      userName = currentUser.fullName;
     }
+    final groupsStream = await  FireStoreRepository(uid: FirebaseAuth.instance.currentUser!.uid)
+        .getUserGroups();
     await FireStoreRepository(uid: FirebaseAuth.instance.currentUser!.uid)
         .getUserGroups()
         .then((snapshot) {
@@ -67,6 +72,7 @@ class _ChatListPageState extends State<ChatListPage> {
         groups = snapshot;
       });
     });
+
   }
 
   @override
@@ -147,7 +153,8 @@ class _ChatListPageState extends State<ChatListPage> {
           child: const Icon(Icons.person_add_alt_rounded),
           onPressed: () {
             _closeFloatingButton(_key);
-            Navigator.of(context).pushNamed(RouteDefine.addChatGroup.name, arguments: false);
+            Navigator.of(context)
+                .pushNamed(RouteDefine.addChatGroup.name, arguments: false);
           },
         ),
         FloatingActionButton.small(
@@ -157,7 +164,8 @@ class _ChatListPageState extends State<ChatListPage> {
           child: const Icon(Icons.group_add),
           onPressed: () {
             _closeFloatingButton(_key);
-            Navigator.of(context).pushNamed(RouteDefine.addChatGroup.name, arguments: true);
+            Navigator.of(context)
+                .pushNamed(RouteDefine.addChatGroup.name, arguments: true);
           },
         ),
       ],
@@ -182,12 +190,18 @@ class _ChatListPageState extends State<ChatListPage> {
                 },
                 itemBuilder: (context, index) {
                   int reveseIndex = snapshot.data['groups'].length - index - 1;
+                  // print("dongnd1 1---------------------");
+                  // print("dongnd1 1---------------------");
+                  // print("dongnd1 1---------------------");
                   return GroupTile(
+                    key: UniqueKey(),
                     groupName: getName(snapshot.data['groups'][reveseIndex]),
                     groupId: getId(snapshot.data['groups'][reveseIndex]),
                     userName: snapshot.data['fullName'],
                     avatar: avatarCurrentUser,
                     email: email,
+                    currentUserName: userName,
+                    groupMessageUnread: snapshot.data['statusReadMessages'],
                   );
                 },
               );
