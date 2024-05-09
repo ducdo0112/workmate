@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:workmate/common/color/app_color.dart';
 import 'package:workmate/main/main_dev.dart';
 import 'package:workmate/ui/calendar/page/calendar_page.dart';
-import 'package:workmate/ui/chat/page/chat_page.dart';
+import 'package:workmate/ui/chat/page/chat_list_page.dart';
 import 'package:workmate/ui/home/bloc/home_bloc.dart';
 import 'package:workmate/ui/home/bloc/home_state.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +18,7 @@ class HomePage extends StatefulWidget {
 
   static final List<Widget> page = <Widget>[
     const CalendarPage(),
-    const ChatPage(),
+    const ChatListPage(),
     const AccountInfoPage(),
   ];
 

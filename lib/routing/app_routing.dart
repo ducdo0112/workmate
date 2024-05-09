@@ -1,3 +1,4 @@
+import 'package:workmate/ui/add_chat_group/page/add_chat_group_page.dart';
 import 'package:workmate/ui/home/page/home_page.dart';
 import 'package:workmate/ui/login/page/login_page.dart';
 import 'package:workmate/ui/register/page/register_account_page.dart';
@@ -7,26 +8,18 @@ enum RouteDefine {
   login,
   home,
   register,
-  historyPage,
-  influencerList,
-  workmateDetail,
-  workmatePage,
-  inAppWebViewPage,
-  guide,
-  aroundHere,
-  aroundHereNfcView,
-  accountInfor
+  addChatGroup,
 }
 
 class AppRouting {
   static CupertinoPageRoute generateRoute(RouteSettings settings) {
-    final routes = <
-        String
-    ,
-        WidgetBuilder>{
+    final routes = <String, WidgetBuilder>{
       RouteDefine.login.name: (_) => const LoginPage(),
       RouteDefine.home.name: (_) => HomePage(),
       RouteDefine.register.name: (_) => const RegisterAccountPage(),
+      RouteDefine.addChatGroup.name: (_) => AddChatGroupPage(
+          isAddGroupChat:
+              settings.arguments != null ? settings.arguments as bool : false),
     };
 
     final routeBuilder = routes[settings.name];
