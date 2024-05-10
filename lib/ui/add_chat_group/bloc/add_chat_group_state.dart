@@ -23,7 +23,12 @@ class AddChatGroupState extends BaseState {
 
   final String username1;
   final String username2;
+  final String avatarUser1;
+  final String avatarUser2;
   final bool isPrivateGroup;
+
+  final String emailUser1;
+  final String emailUser2;
 
   const AddChatGroupState({
     BlocStatus status = BlocStatus.initial,
@@ -41,6 +46,10 @@ class AddChatGroupState extends BaseState {
     this.statusCreatePrivateGroup = BlocStatus.initial,
     this.username1 = '',
     this.username2 = '',
+    this.avatarUser1 = '',
+    this.avatarUser2 = '',
+    this.emailUser1 = '',
+    this.emailUser2 = '',
     this.isPrivateGroup = false,
     this.isAdmin = false,
   }) : super(status: status, exception: exception);
@@ -61,6 +70,10 @@ class AddChatGroupState extends BaseState {
     String? usernameAdmin,
     String? username1,
     String? username2,
+    String? avatarUser1,
+    String? avatarUser2,
+    String? emailUser1,
+    String? emailUser2,
     bool? isPrivateGroup,
     bool? isAdmin,
   }) =>
@@ -84,6 +97,10 @@ class AddChatGroupState extends BaseState {
         username2: username2 ?? this.username2,
         isPrivateGroup: isPrivateGroup ?? this.isPrivateGroup,
         isAdmin: isAdmin ?? this.isAdmin,
+        avatarUser1: avatarUser1 ?? this.avatarUser1,
+        avatarUser2: avatarUser2 ?? this.avatarUser2,
+        emailUser1: emailUser1 ?? this.emailUser1,
+        emailUser2: emailUser2 ?? this.emailUser2,
       );
 
   @override
@@ -103,6 +120,10 @@ class AddChatGroupState extends BaseState {
       username1,
       username2,
       isPrivateGroup,
-      isAdmin
+      isAdmin,
+      avatarUser2,
+      avatarUser1,
+      emailUser1,
+      emailUser2,
     ]);
 }

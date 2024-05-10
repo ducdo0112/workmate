@@ -30,7 +30,6 @@ class _ChatListPageState extends State<ChatListPage> {
   String avatarCurrentUser = "";
   String email = "";
   Stream? groups;
-  bool _isLoading = false;
   String groupName = "";
   Stream? streamData;
 
@@ -63,8 +62,6 @@ class _ChatListPageState extends State<ChatListPage> {
       this.email = email;
       userName = currentUser.fullName;
     }
-    final groupsStream = await  FireStoreRepository(uid: FirebaseAuth.instance.currentUser!.uid)
-        .getUserGroups();
     await FireStoreRepository(uid: FirebaseAuth.instance.currentUser!.uid)
         .getUserGroups()
         .then((snapshot) {
@@ -190,9 +187,6 @@ class _ChatListPageState extends State<ChatListPage> {
                 },
                 itemBuilder: (context, index) {
                   int reveseIndex = snapshot.data['groups'].length - index - 1;
-                  // print("dongnd1 1---------------------");
-                  // print("dongnd1 1---------------------");
-                  // print("dongnd1 1---------------------");
                   return GroupTile(
                     key: UniqueKey(),
                     groupName: getName(snapshot.data['groups'][reveseIndex]),

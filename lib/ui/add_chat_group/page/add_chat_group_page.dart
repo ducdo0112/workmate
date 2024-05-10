@@ -72,10 +72,14 @@ class AddChatGroupPage extends StatelessWidget {
                   username1: p1.username1,
                   username2: p1.username2,
                   isAdmin: p1.isAdmin,
+                  avatarUser1: "",
+                  avatarUser2: "",
+                  emailUser1: "",
+                  emailUser2: "",
                 ));
             return;
           }
-          if(p1.statusCreatePrivateGroup == BlocStatus.success) {
+          if (p1.statusCreatePrivateGroup == BlocStatus.success) {
             Navigator.of(context).pop();
             nextScreen(
                 context,
@@ -88,10 +92,13 @@ class AddChatGroupPage extends StatelessWidget {
                   isPrivateGroup: p1.isPrivateGroup,
                   username1: p1.username1,
                   username2: p1.username2,
-                    isAdmin: p1.isAdmin
+                  isAdmin: p1.isAdmin,
+                  avatarUser1: p1.avatarUser1,
+                  avatarUser2: p1.avatarUser2,
+                  emailUser1: p1.emailUser1,
+                  emailUser2: p1.emailUser2,
                 ));
           }
-
         },
         shouldShowLoadingFullScreen: true,
         builder: (context, state) {

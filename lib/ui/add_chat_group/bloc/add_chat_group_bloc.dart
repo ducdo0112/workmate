@@ -134,8 +134,16 @@ class AddChatGroupBloc extends Bloc<AddChatGroupEvent, AddChatGroupState> {
         listUserName.add(otherUser.fullName);
 
         final groupId = await FireStoreRepository(uid: adminUser.uid)
-            .createPrivateGroup(adminUser.fullName, adminUser.uid,
-                state.groupName, listUuidUser, listUserName);
+            .createPrivateGroup(
+                adminUser.fullName,
+                adminUser.uid,
+                state.groupName,
+                listUuidUser,
+                listUserName,
+                adminUser.profilePic,
+                otherUser.profilePic,
+                adminUser.email,
+                otherUser.email);
         emit(state.copyWith(
             statusCreatePrivateGroup: BlocStatus.success,
             groupId: groupId,
@@ -146,7 +154,11 @@ class AddChatGroupBloc extends Bloc<AddChatGroupEvent, AddChatGroupState> {
             isPrivateGroup: true,
             isAdmin: true,
             username1: adminUser.fullName,
-            username2: otherUser.fullName));
+            username2: otherUser.fullName,
+            avatarUser1: adminUser.profilePic,
+            avatarUser2: otherUser.profilePic,
+            emailUser1: adminUser.email,
+            emailUser2: otherUser.email));
       },
       onError: (e) {
         emit(state.copyWith(

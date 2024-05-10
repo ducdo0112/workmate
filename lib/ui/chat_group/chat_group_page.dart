@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:workmate/common/color/app_color.dart';
 import 'package:workmate/repository/firestore_repository.dart';
 import 'package:workmate/ui/chat/page/widget/message_tile.dart';
+import 'package:workmate/ui/chat_group/chat_group_avatar_header.dart';
 
 import '../../model/user/user_info_data.dart';
 
@@ -18,6 +19,10 @@ class ChatGroupPage extends StatefulWidget {
   final String username1;
   final String username2;
   final bool isAdmin;
+  final String avatarUser1;
+  final String avatarUser2;
+  final String emailUser1;
+  final String emailUser2;
 
   const ChatGroupPage({
     Key? key,
@@ -30,6 +35,10 @@ class ChatGroupPage extends StatefulWidget {
     required this.username1,
     required this.username2,
     required this.isAdmin,
+    required this.avatarUser1,
+    required this.avatarUser2,
+    required this.emailUser1,
+    required this.emailUser2,
   }) : super(key: key);
 
   @override
@@ -39,9 +48,12 @@ class ChatGroupPage extends StatefulWidget {
 class _ChatGroupPageState extends State<ChatGroupPage> {
   Stream<QuerySnapshot>? chats;
   TextEditingController messaagesController = TextEditingController();
-  String admin = "";
+  //String admin = "";
   final ScrollController _scrollController = ScrollController();
   List<UserInfoData>? listUserInfoData;
+
+  Widget? appbar;
+  bool needBuildAppbar = false;
 
   @override
   void initState() {
@@ -57,43 +69,50 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
       });
     }
 
-    var adminResult = await FireStoreRepository().getGroupAdmin(widget.groupId);
-    if (adminResult != null) {
-      setState(() {
-        admin = adminResult;
-      });
-    }
+    // var adminResult = await FireStoreRepository().getGroupAdmin(widget.groupId);
+    // if (adminResult != null) {
+    //   setState(() {
+    //     admin = adminResult;
+    //   });
+    // }
 
     FireStoreRepository().getUserStream().snapshots().listen((event) async {
       final listUserChange = await FireStoreRepository().getAllUser();
-      // setState(() {
-      //   listUserInfoData = listUserChange;
-      // });
+      if(isDifferentUserList(listUserInfoData ?? [], listUserChange)) {
+        setState(() {
+          needBuildAppbar = true;
+          listUserInfoData = listUserChange;
+        });
+      }
     });
+  }
+
+  bool isDifferentUserList(List<UserInfoData> oldList, List<UserInfoData> newList) {
+    if(oldList.length != newList.length) {
+      return true;
+    }
+
+    for(var i = 0; i< oldList.length; i++) {
+      final oldUser = oldList[i];
+      final newUser = newList[i];
+
+      if(oldUser.fullName != newUser.fullName || oldUser.status != newUser.status || oldUser.profilePic != newUser.profilePic) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @override
   Widget build(BuildContext context) {
-    _scrollToBottom(2);
+    //_scrollToBottom(2);
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        elevation: 0,
-        title: Text(_getTitle()),
-        backgroundColor: AppColor.orangePeel,
-        actions: [
-          Visibility(
-              visible: !widget.isPrivateGroup,
-              child: _buildButtonExitGroup(
-                  context, widget.groupId, widget.groupName, widget.userName))
-        ],
-      ),
+      appBar: _buildAppBar(),
       body: Column(
         children: <Widget>[
           Expanded(
             flex: 9,
             child: SizedBox(
-              height: MediaQuery.of(context).size.height * 0.9,
               child: chatMessages(),
             ),
           ),
@@ -101,11 +120,11 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
             flex: 2,
             child: Container(
               alignment: Alignment.bottomCenter,
-              width: MediaQuery.of(context).size.width,
+              width: double.infinity,
               child: Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-                width: MediaQuery.of(context).size.width,
+                width: double.infinity,
                 child: Row(
                   children: [
                     Expanded(
@@ -155,6 +174,70 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
         ],
       ),
     );
+  }
+
+  _buildAppBar() {
+    print("dongnd1 buildappbar");
+    String displayAvatar = "";
+    String emailDisplay = "";
+    if (widget.userName == widget.username1) {
+      displayAvatar = widget.avatarUser2;
+      emailDisplay = widget.emailUser2;
+    } else {
+      displayAvatar = widget.avatarUser1;
+      emailDisplay = widget.emailUser1;
+    }
+    if(appbar == null || needBuildAppbar) {
+      needBuildAppbar = false;
+      appbar = AppBar(
+        centerTitle: true,
+        elevation: 0,
+        title: widget.isPrivateGroup
+            ? Row(
+          children: [
+            Visibility(
+              visible: widget.isPrivateGroup,
+              child: ChatGroupAvatarHeader(
+                imageBase64: displayAvatar,
+                status: getStatusUser(emailDisplay),
+                onClicked: () {},
+              ),
+            ),
+            const SizedBox(
+              width: 12,
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _getTitle(),
+                  style:
+                  const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(
+                  height: 4,
+                ),
+                Text(
+                  getStatusUser(emailDisplay),
+                  style: const TextStyle(
+                    fontSize: 12,
+                  ),
+                )
+              ],
+            )
+          ],
+        )
+            : Text(_getTitle()),
+        backgroundColor: AppColor.orangePeel,
+        actions: [
+          Visibility(
+              visible: !widget.isPrivateGroup,
+              child: _buildButtonExitGroup(
+                  context, widget.groupId, widget.groupName, widget.userName))
+        ],
+      );
+    }
+    return appbar;
   }
 
   _buildButtonExitGroup(
@@ -249,10 +332,9 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
 
   _scrollToBottom(int seconds) {
     Timer(Duration(seconds: seconds), () {
-      if(_scrollController.hasClients) {
+      if (_scrollController.hasClients) {
         _scrollController.jumpTo(_scrollController.position.minScrollExtent);
       }
-
 
       // update status read
       FireStoreRepository().updateStatusMessageToRead(widget.groupId);
