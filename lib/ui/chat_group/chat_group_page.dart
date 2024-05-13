@@ -48,6 +48,7 @@ class ChatGroupPage extends StatefulWidget {
 class _ChatGroupPageState extends State<ChatGroupPage> {
   Stream<QuerySnapshot>? chats;
   TextEditingController messaagesController = TextEditingController();
+
   //String admin = "";
   final ScrollController _scrollController = ScrollController();
   List<UserInfoData>? listUserInfoData;
@@ -78,7 +79,7 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
 
     FireStoreRepository().getUserStream().snapshots().listen((event) async {
       final listUserChange = await FireStoreRepository().getAllUser();
-      if(isDifferentUserList(listUserInfoData ?? [], listUserChange)) {
+      if (isDifferentUserList(listUserInfoData ?? [], listUserChange)) {
         setState(() {
           needBuildAppbar = true;
           listUserInfoData = listUserChange;
@@ -87,16 +88,19 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
     });
   }
 
-  bool isDifferentUserList(List<UserInfoData> oldList, List<UserInfoData> newList) {
-    if(oldList.length != newList.length) {
+  bool isDifferentUserList(
+      List<UserInfoData> oldList, List<UserInfoData> newList) {
+    if (oldList.length != newList.length) {
       return true;
     }
 
-    for(var i = 0; i< oldList.length; i++) {
+    for (var i = 0; i < oldList.length; i++) {
       final oldUser = oldList[i];
       final newUser = newList[i];
 
-      if(oldUser.fullName != newUser.fullName || oldUser.status != newUser.status || oldUser.profilePic != newUser.profilePic) {
+      if (oldUser.fullName != newUser.fullName ||
+          oldUser.status != newUser.status ||
+          oldUser.profilePic != newUser.profilePic) {
         return true;
       }
     }
@@ -105,7 +109,7 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
 
   @override
   Widget build(BuildContext context) {
-    //_scrollToBottom(2);
+    _scrollToBottom(2);
     return Scaffold(
       appBar: _buildAppBar(),
       body: Column(
@@ -187,46 +191,46 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
       displayAvatar = widget.avatarUser1;
       emailDisplay = widget.emailUser1;
     }
-    if(appbar == null || needBuildAppbar) {
+    if (appbar == null || needBuildAppbar) {
       needBuildAppbar = false;
       appbar = AppBar(
         centerTitle: true,
         elevation: 0,
         title: widget.isPrivateGroup
             ? Row(
-          children: [
-            Visibility(
-              visible: widget.isPrivateGroup,
-              child: ChatGroupAvatarHeader(
-                imageBase64: displayAvatar,
-                status: getStatusUser(emailDisplay),
-                onClicked: () {},
-              ),
-            ),
-            const SizedBox(
-              width: 12,
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _getTitle(),
-                  style:
-                  const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(
-                  height: 4,
-                ),
-                Text(
-                  getStatusUser(emailDisplay),
-                  style: const TextStyle(
-                    fontSize: 12,
+                children: [
+                  Visibility(
+                    visible: widget.isPrivateGroup,
+                    child: ChatGroupAvatarHeader(
+                      imageBase64: displayAvatar,
+                      status: getStatusUser(emailDisplay),
+                      onClicked: () {},
+                    ),
                   ),
-                )
-              ],
-            )
-          ],
-        )
+                  const SizedBox(
+                    width: 12,
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _getTitle(),
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(
+                        height: 4,
+                      ),
+                      Text(
+                        getStatusUser(emailDisplay),
+                        style: const TextStyle(
+                          fontSize: 12,
+                        ),
+                      )
+                    ],
+                  )
+                ],
+              )
             : Text(_getTitle()),
         backgroundColor: AppColor.orangePeel,
         actions: [
@@ -287,14 +291,14 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
                   data[index]['email'] == data[index - 1]['email'];
             }
             return MessageTile(
-              message: data[index]['message'],
-              sender: data[index]['sender'],
-              sentByMe: widget.userName == data[index]['sender'],
-              avatar: data[index]['avatar'],
-              isSameSenderBefore: isSameSenderBefore,
-              email: data[index]['email'],
-              status: getStatusUser(data[index]['email']),
-            );
+                message: data[index]['message'],
+                sender: data[index]['sender'],
+                sentByMe: widget.userName == data[index]['sender'],
+                avatar: data[index]['avatar'],
+                isSameSenderBefore: isSameSenderBefore,
+                email: data[index]['email'],
+                status: getStatusUser(data[index]['email']),
+                isPrivateChat: widget.isPrivateGroup);
           },
         );
       },

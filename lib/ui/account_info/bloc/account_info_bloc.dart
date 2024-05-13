@@ -100,8 +100,10 @@ class AccountInfoBloc extends Bloc<AccountInfoEvent, AccountInfoState> {
         onCallApi: () async {
           emit(state.copyWith(updateStatus: BlocStatus.loading));
           await FireStoreRepository(uid: FirebaseAuth.instance.currentUser!.uid)
-              .updateUserdata(state.userAfterModify?.fullName ?? '',
-                  state.userAfterModify?.profilePic ?? '', state.userAfterModify?.status ?? 'Online');
+              .updateUserdata(
+                  state.userAfterModify?.fullName ?? '',
+                  state.userAfterModify?.profilePic ?? '',
+                  state.userAfterModify?.status ?? 'Online');
 
           emit(state.copyWith(
               updateStatus: BlocStatus.success, user: state.userAfterModify));
@@ -154,10 +156,11 @@ class AccountInfoBloc extends Bloc<AccountInfoEvent, AccountInfoState> {
   }
 
   Future<void> _onAccountStatusChanged(
-      AccountEventStatusChanged event,
-      Emitter<AccountInfoState> emit,
-      ) async {
-    await SharedPreferencesHelper.setStringType(SharedPreferencesHelper.keyStatus, event.status ?? "Online");
+    AccountEventStatusChanged event,
+    Emitter<AccountInfoState> emit,
+  ) async {
+    await SharedPreferencesHelper.setStringType(
+        SharedPreferencesHelper.keyStatus, event.status ?? "Online");
     final currentUserAfterModify = state.userAfterModify;
     final userAfterModify = UserInfoData(
         currentUserAfterModify?.fullName ?? '',
@@ -165,6 +168,7 @@ class AccountInfoBloc extends Bloc<AccountInfoEvent, AccountInfoState> {
         currentUserAfterModify?.profilePic ?? '',
         currentUserAfterModify?.uid ?? '',
         event.status ?? "Online");
-    emit(state.copyWith(userStatus: event.status, userAfterModify: userAfterModify));
+    emit(state.copyWith(
+        userStatus: event.status, userAfterModify: userAfterModify));
   }
 }

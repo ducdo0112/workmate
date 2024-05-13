@@ -4,6 +4,8 @@ import 'package:workmate/model/enum/bloc_status.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../widget/loading_progress_with_full_background.dart';
+
 typedef BlocStateCallback<S> = void Function(BuildContext context, S? state);
 
 /// Create a [BlocConsumer] with its state extends [BaseState] and its Bloc
@@ -27,6 +29,7 @@ BlocConsumer<B, S>
   Function(BuildContext, S)? listener,
   Function(BuildContext, S)? onErrorAction,
   Function(BuildContext, S)? onDisconnectAction,
+  bool? usingFullBackgroundLoadingDialog = false,
 }) {
   return BlocConsumer<B, S>(
     key: key,
@@ -34,9 +37,11 @@ BlocConsumer<B, S>
       listener?.call(context, state);
       switch (state.status) {
         case BlocStatus.noInternetError:
+
           /// show dialog lost connection in here
           break;
         case BlocStatus.forceLogout:
+
           /// handle force logout
           break;
         case BlocStatus.loading:
@@ -46,6 +51,7 @@ BlocConsumer<B, S>
           onSuccess?.call(context, state);
           break;
         case BlocStatus.error:
+
           /// handle  and show dialog error if needed
           onError?.call(context, state);
           break;
@@ -56,7 +62,9 @@ BlocConsumer<B, S>
     builder: (context, state) {
       if (shouldShowLoadingFullScreen ?? false) {
         if (state.status == BlocStatus.loading) {
-          return const LoadingProgress();
+          return (usingFullBackgroundLoadingDialog ?? false)
+              ? const LoadingProgressWithFullBackground()
+              : const LoadingProgress();
         }
       }
       return builder.call(context, state);

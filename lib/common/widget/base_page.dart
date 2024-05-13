@@ -39,23 +39,15 @@ Widget buildFloatingButton(VoidCallback? floatingButtonAction) {
       }
     },
     child: Container(
-      width: 67.w,
-      height: 67.w,
-      decoration: BoxDecoration(
-        color: Colors.transparent,
-        borderRadius: const BorderRadius.all(
+      width: 50.w,
+      height: 50.w,
+      decoration: const BoxDecoration(
+        color: AppColor.orangePeel,
+        borderRadius: BorderRadius.all(
           Radius.circular(100),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            spreadRadius: 0,
-            blurRadius: 10,
-            offset: const Offset(0, 1),
-          ),
-        ],
       ),
-      child: SvgPicture.asset(AppImages.floatingButton),
+      child: const Icon(Icons.add, color: AppColor.white,),
     ),
   );
 }

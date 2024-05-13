@@ -129,7 +129,7 @@ class MyInterceptor extends Interceptor {
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     logger.d(
-        'Request API response: statusCode: ${response.statusCode}, ${Timestamp.getCurrentTimeStamp()}');
+        'Request API response: statusCode: ${response.statusCode}, ${TimestampUtil.getCurrentTimeStamp()}');
     logger.d('Request API response: data: ${response.data}');
     super.onResponse(response, handler);
   }
@@ -137,7 +137,7 @@ class MyInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     logger.e(
-        'Request API error: ${err.requestOptions.uri} ,${err.response?.statusCode} ${err.message},${Timestamp.getCurrentTimeStamp()}');
+        'Request API error: ${err.requestOptions.uri} ,${err.response?.statusCode} ${err.message},${TimestampUtil.getCurrentTimeStamp()}');
     super.onError(err, handler);
   }
 

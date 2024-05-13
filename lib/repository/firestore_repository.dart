@@ -1,8 +1,15 @@
+import 'dart:io';
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:workmate/model/event/event.dart';
 import 'package:workmate/model/group/group.dart';
 import 'package:workmate/model/user/user_info_data.dart';
+import 'package:workmate/utils/timestamp.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class FireStoreRepository {
   final String? uid;
@@ -14,6 +21,8 @@ class FireStoreRepository {
       FirebaseFirestore.instance.collection("users");
   final CollectionReference groupCollection =
       FirebaseFirestore.instance.collection("groups");
+  final CollectionReference eventsCollection =
+      FirebaseFirestore.instance.collection("events");
 
   // saving the userdata
   Future savingUserdata(String fullname, String email) async {
@@ -28,10 +37,59 @@ class FireStoreRepository {
     });
   }
 
+  Future testestIsolate() async {
+    return await userCollection
+        .doc("J1Fpt6mlr5YsXHHQ678hpjDZeKE3")
+        .update({"fullName": "today3", "status": "Vắng mặt"});
+  }
+
   Future updateUserdata(
       String fullname, String profilePic, String status) async {
     return await userCollection.doc(uid).update(
         {"fullName": fullname, "profilePic": profilePic, "status": status});
+  }
+
+  Future<Event> findEventById(DateTime dateTime, String id) async {
+    String dateTimeString = TimestampUtil.formatTimeDDMMYYYY(dateTime);
+    DocumentSnapshot doc = await eventsCollection
+        .doc(dateTimeString)
+        .collection("list_events")
+        .doc(id)
+        .get();
+    return Event.fromJson(doc.data() as Map<String, dynamic>);
+  }
+
+  // getting all user data
+  Future<List<UserInfoData>> getAllUserInfoByListConditionExceptMe(
+      List<String> uuids) async {
+    // Get docs from collection reference
+    QuerySnapshot querySnapshot = await userCollection.get();
+
+    // Get data from docs and convert map to List
+    final allData = querySnapshot.docs
+        .map((doc) =>
+            UserInfoData.fromJson((doc.data() as Map<String, dynamic>)))
+        .toList();
+
+    try {
+      return allData
+          .where((element) =>
+              uuids.contains(element.uid) &&
+              element.uid != FirebaseAuth.instance.currentUser!.uid)
+          .toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<String> uploadPdfFile(File file, String name, String timeStamp) async {
+    String path = '${timeStamp}_${name}';
+    TaskSnapshot taskSnapshot =
+        await FirebaseStorage.instance.ref('pdf').child(path).putFile(file);
+    final String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+
+    //await FirebaseFirestore.instance.collection(path).add({"url": downloadUrl, "name": name});
+    return downloadUrl;
   }
 
   // getting all user data
@@ -46,6 +104,23 @@ class FireStoreRepository {
         .toList();
 
     return allData;
+  }
+
+  // getting all user data
+  Future<List<UserInfoData>> getAllExceptMe() async {
+    // Get docs from collection reference
+    QuerySnapshot querySnapshot = await userCollection.get();
+
+    // Get data from docs and convert map to List
+    final allData = querySnapshot.docs
+        .map((doc) =>
+            UserInfoData.fromJson((doc.data() as Map<String, dynamic>)))
+        .toList();
+
+    return allData
+        .where(
+            (element) => element.uid != FirebaseAuth.instance.currentUser!.uid)
+        .toList();
   }
 
   // getting all user data
@@ -79,6 +154,131 @@ class FireStoreRepository {
   // get user groups
   getUserGroups() async {
     return userCollection.doc(uid).snapshots();
+  }
+
+  getListEventByDate(String date) {
+    return eventsCollection.doc(date).collection("list_events").snapshots();
+  }
+
+  Future addNewEvent({
+    required String title,
+    required String note,
+    required DateTime dateTime,
+    required TimeOfDay hourStart,
+    required TimeOfDay hourEnd,
+    required int typeOfRemind,
+    required List<String> uuidUser,
+    required String tag,
+    required String uuidAdmin,
+    required String urlPdfFile,
+    required String fileName,
+  }) async {
+    String dateTimeString = TimestampUtil.formatTimeDDMMYYYY(dateTime);
+    print("dongnd1 time: $dateTimeString");
+
+    CollectionReference eventsByDate =
+        eventsCollection.doc(dateTimeString).collection("list_events");
+    DocumentReference newEvent = await eventsByDate.add({
+      "id": "",
+      "title": title,
+      "note": note,
+      "dateTime": TimestampUtil.formatTimeYYYYMMDDWithOutSeparate(dateTime),
+      "hourStart": TimestampUtil.formatTimeHHMM(hourStart),
+      "hourEnd": TimestampUtil.formatTimeHHMM(hourEnd),
+      "tag": tag,
+      "users": FieldValue.arrayUnion(uuidUser),
+      "uuidAdmin": uuidAdmin,
+      "typeOfRemind": typeOfRemind,
+      "urlPdfFile": urlPdfFile,
+      "fileName": fileName,
+    });
+
+    newEvent.update({
+      "id": newEvent.id,
+    });
+  }
+
+  Future updateEvent({
+    required String id,
+    required String title,
+    required String note,
+    required DateTime dateTime,
+    required TimeOfDay hourStart,
+    required TimeOfDay hourEnd,
+    required int typeOfRemind,
+    required List<String> uuidUser,
+    required String tag,
+    required String uuidAdmin,
+    required String urlPdfFile,
+    required String fileName,
+    required bool isChangeDate,
+    required DateTime oldDate,
+  }) async {
+    String dateTimeString = TimestampUtil.formatTimeDDMMYYYY(dateTime);
+    print("dongnd1 time: $dateTimeString");
+
+    DocumentSnapshot documentSnapshot =
+    await eventsCollection.doc(dateTimeString).collection("list_events").doc(id).get();
+    if(documentSnapshot.data() != null) {
+      await eventsCollection.doc(dateTimeString).collection("list_events").doc(id).update({
+        "id": id,
+        "title": title,
+        "note": note,
+        "dateTime": TimestampUtil.formatTimeYYYYMMDDWithOutSeparate(dateTime),
+        "hourStart": TimestampUtil.formatTimeHHMM(hourStart),
+        "hourEnd": TimestampUtil.formatTimeHHMM(hourEnd),
+        "tag": tag,
+        "users": [],
+        "uuidAdmin": uuidAdmin,
+        "typeOfRemind": typeOfRemind,
+        "urlPdfFile": urlPdfFile,
+        "fileName": fileName,
+      });
+      await eventsCollection.doc(dateTimeString).collection("list_events").doc(id).update({
+        "users": FieldValue.arrayUnion(uuidUser),
+      });
+    } else {
+      DocumentReference newEvent = await eventsCollection.doc(dateTimeString).collection("list_events").add({
+        "id": "",
+        "title": title,
+        "note": note,
+        "dateTime": TimestampUtil.formatTimeYYYYMMDDWithOutSeparate(dateTime),
+        "hourStart": TimestampUtil.formatTimeHHMM(hourStart),
+        "hourEnd": TimestampUtil.formatTimeHHMM(hourEnd),
+        "tag": tag,
+        "users": FieldValue.arrayUnion(uuidUser),
+        "uuidAdmin": uuidAdmin,
+        "typeOfRemind": typeOfRemind,
+        "urlPdfFile": urlPdfFile,
+        "fileName": fileName,
+      });
+
+      newEvent.update({
+        "id": newEvent.id,
+      });
+
+      String oldDateTimeString = TimestampUtil.formatTimeDDMMYYYY(oldDate);
+      await eventsCollection.doc(oldDateTimeString).collection("list_events").doc(id).delete();
+    }
+
+    // DocumentReference newEvent = await eventsByDate.add({
+    //   "id": "",
+    //   "title": title,
+    //   "note": note,
+    //   "dateTime": TimestampUtil.formatTimeYYYYMMDDWithOutSeparate(dateTime),
+    //   "hourStart": TimestampUtil.formatTimeHHMM(hourStart),
+    //   "hourEnd": TimestampUtil.formatTimeHHMM(hourEnd),
+    //   "tag": tag,
+    //   "users": FieldValue.arrayUnion(uuidUser),
+    //   "uuidAdmin": uuidAdmin,
+    //   "typeOfRemind": typeOfRemind,
+    //   "urlPdfFile": urlPdfFile,
+    //   "fileName": fileName,
+    // });
+    //
+    // newEvent.update({
+    //   "id": newEvent.id,
+    // });
   }
 
   test(String uid) async {

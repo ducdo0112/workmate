@@ -4,7 +4,9 @@ import 'package:workmate/repository/firestore_repository.dart';
 import 'package:workmate/repository/network_repository.dart';
 import 'package:workmate/ui/account_info/bloc/account_info_bloc.dart';
 import 'package:workmate/ui/add_chat_group/bloc/add_chat_group_bloc.dart';
+import 'package:workmate/ui/calendar/bloc/calender_bloc.dart';
 import 'package:workmate/ui/chat/bloc/chat_bloc.dart';
+import 'package:workmate/ui/events/bloc/add_event_bloc.dart';
 import 'package:workmate/ui/home/bloc/home_bloc.dart';
 import 'package:workmate/ui/login/bloc/login_bloc.dart';
 import 'package:workmate/ui/register/bloc/register_bloc.dart';
@@ -27,4 +29,8 @@ Future<void> setupDependency({String baseUrl = Const.baseUrlStg}) async {
   getIt.registerFactory<ChatBloc>(() => ChatBloc(fireStoreRepository: getIt()));
   getIt.registerFactory<AddChatGroupBloc>(
       () => AddChatGroupBloc(fireStoreRepository: getIt()));
+  getIt.registerFactory<CalendarBloc>(
+      () => CalendarBloc(fireStoreRepository: getIt()));
+  getIt.registerFactory<AddEventBloc>(
+      () => AddEventBloc(fireStoreRepository: getIt()));
 }

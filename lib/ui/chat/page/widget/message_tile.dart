@@ -11,6 +11,7 @@ class MessageTile extends StatefulWidget {
   final String avatar;
   final String email;
   final bool isSameSenderBefore;
+  final bool isPrivateChat;
   final String status;
 
   const MessageTile({
@@ -22,6 +23,7 @@ class MessageTile extends StatefulWidget {
     required this.email,
     required this.isSameSenderBefore,
     required this.status,
+    required this.isPrivateChat,
   }) : super(key: key);
 
   @override
@@ -61,24 +63,28 @@ class _MessageTileState extends State<MessageTile> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  widget.sender.toUpperCase(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      letterSpacing: -0.5),
-                ),
-                SizedBox(width: 4,),
-                widget.status == "Online" ? Icon(Icons.online_prediction, color: Colors.green,) : Icon(Icons.remove_circle_outline, color: Colors.grey,)
-              ],
+            Visibility(
+              visible: !widget.isPrivateChat,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    widget.sender.toUpperCase(),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        letterSpacing: -0.5),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(
-              height: 8,
+            Visibility(
+              visible: !widget.isPrivateChat,
+              child: const SizedBox(
+                height: 8,
+              ),
             ),
             Text(
               widget.message,

@@ -1,7 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:workmate/utils/logger.dart';
 import 'package:intl/intl.dart';
 
-class Timestamp {
+class TimestampUtil {
   static String getCurrentTimeStamp() {
     DateTime now = DateTime.now();
     return ' timestamp: ${now.hour}:${now.minute}:${now.second}.${now.millisecond}';
@@ -71,6 +72,77 @@ class Timestamp {
     } catch (e) {
       logger.e('Error when get daysBetween: $time');
       return -1;
+    }
+  }
+
+  static String formatTimeDDMMYYYY(DateTime dateTime) {
+    return DateFormat('ddMMyyyy').format(dateTime);
+  }
+
+  static String formatTimeYYYYMMDDWithOutSeparate(DateTime dateTime) {
+    return DateFormat('yyyy-MM-dd').format(dateTime);
+  }
+
+  static DateTime? convertStringYYYYMMDDToDateTime(String? dateTime) {
+    try {
+      return DateFormat('yyyy-MM-dd').parse(dateTime!);
+    } catch (_) {
+      return null;
+    }
+  }
+
+
+  static DateTime? convertStringDDMMYYWithSeparateToDateTime(String? dateTime) {
+    try {
+      return DateFormat('dd/mm/yyyy').parse(dateTime!);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static TimeOfDay? convertStringToTimeOfDay(String? timeString) {
+    try {
+      List<String>? parts = timeString?.split(':');
+      int hour = int.parse(parts![0]);
+      int minute = int.parse(parts[1]);
+      return TimeOfDay(hour: hour, minute: minute);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static String formatTimeHHMM(TimeOfDay time) {
+    return '${time.hour}:${time.minute.toString().padLeft(2, '0')}';
+  }
+
+  static String getNameOfMonthInVietName(DateTime dateTime) {
+    switch (dateTime.month) {
+      case 1:
+        return "Tháng 1";
+      case 2:
+        return "Tháng 2";
+      case 3:
+        return "Tháng 3";
+      case 4:
+        return "Tháng 4";
+      case 5:
+        return "Tháng 5";
+      case 6:
+        return "Tháng 6";
+      case 7:
+        return "Tháng 7";
+      case 8:
+        return "Tháng 8";
+      case 9:
+        return "Tháng 9";
+      case 10:
+        return "Tháng 10";
+      case 11:
+        return "Tháng 11";
+      case 12:
+        return "Tháng 12";
+      default:
+        return "";
     }
   }
 }
