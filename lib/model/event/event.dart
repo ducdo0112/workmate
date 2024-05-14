@@ -16,6 +16,7 @@ class Event {
   final String? uuidAdmin;
   final String? urlPdfFile;
   final String? fileName;
+  final int? notificationId;
 
   Event(
     this.id,
@@ -29,7 +30,8 @@ class Event {
     this.uuidAdmin,
     this.users,
     this.urlPdfFile,
-      this.fileName
+    this.fileName,
+    this.notificationId,
   );
 
   factory Event.fromJson(Map<String, dynamic> json) => _$EventFromJson(json);

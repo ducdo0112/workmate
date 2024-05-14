@@ -12,6 +12,7 @@ UserInfoData _$UserInfoDataFromJson(Map<String, dynamic> json) => UserInfoData(
       json['profilePic'] as String,
       json['uid'] as String,
       json['status'] as String,
+      json['fcmToken'] as String?,
     );
 
 Map<String, dynamic> _$UserInfoDataToJson(UserInfoData instance) =>
@@ -21,4 +22,5 @@ Map<String, dynamic> _$UserInfoDataToJson(UserInfoData instance) =>
       'profilePic': instance.profilePic,
       'uid': instance.uid,
       'status': instance.status,
+      'fcmToken': instance.fcmToken,
     };

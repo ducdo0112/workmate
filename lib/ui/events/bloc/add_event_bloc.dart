@@ -2,7 +2,10 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:workmate/service/firebase/alarm_manager_service.dart';
+import 'package:workmate/service/firebase/firebase_remote_message_service.dart';
 import 'package:workmate/ui/events/bloc/add_event_event.dart';
 import 'package:workmate/ui/events/bloc/add_event_state.dart';
 import 'package:workmate/utils/timestamp.dart';
@@ -186,7 +189,7 @@ class AddEventBloc extends Bloc<AddEventEvent, AddEventState> {
                       .millisecondsSinceEpoch
                       .toString());
             }
-            await fireStoreRepository.addNewEvent(
+            String eventId = await fireStoreRepository.addNewEvent(
               title: state.titleEdit,
               note: state.noteEdit,
               dateTime: state.dateTimeEdit!,
@@ -199,6 +202,20 @@ class AddEventBloc extends Bloc<AddEventEvent, AddEventState> {
               urlPdfFile: urlPdfFile,
               fileName: fileName,
             );
+
+            // add schedule push notification
+            final idNotification = await _addScheduleWhenAddNewEvent(
+              state.dateTimeEdit!,
+              state.startHourEdit!,
+              state.titleEdit,
+              "Bắt đầu lúc: ${TimestampUtil.formatTimeHHMM(state.startHourEdit!)}",
+              state.remindTypeEdit,
+              uuids,
+              eventId,
+            );
+
+            await FireStoreRepository().updateNotificationIdForEvent(
+                state.dateTimeEdit!, eventId, idNotification);
             emit(state.copyWith(statusRegisterOrUpdate: BlocStatus.success));
           },
           onError: (e) {
@@ -250,7 +267,7 @@ class AddEventBloc extends Bloc<AddEventEvent, AddEventState> {
                       .toString());
             }
             bool isChangeDate = state.dateTime != state.dateTimeEdit;
-            await fireStoreRepository.updateEvent(
+            String eventId = await fireStoreRepository.updateEvent(
               id: state.eventId,
               title: state.titleEdit,
               note: state.noteEdit,
@@ -266,6 +283,24 @@ class AddEventBloc extends Bloc<AddEventEvent, AddEventState> {
               isChangeDate: isChangeDate,
               oldDate: state.dateTime!,
             );
+            // xoa notification o event cu
+            if(state.notificationId != null) {
+              print("Xoa schedule notification id: ${state.notificationId}");
+              await _cancelScheduleNotification(state.notificationId!);
+            }
+
+            // tao notification moi va them vao
+            final idNotification = await  _addScheduleWhenAddNewEvent(state.dateTimeEdit!,
+              state.startHourEdit!,
+              state.titleEdit,
+              "Bắt đầu lúc: ${TimestampUtil.formatTimeHHMM(state.startHourEdit!)}",
+              state.remindTypeEdit,
+              uuids,
+              eventId,);
+            await FireStoreRepository().updateNotificationIdForEvent(
+                state.dateTimeEdit!, eventId, idNotification);
+            emit(state.copyWith(statusRegisterOrUpdate: BlocStatus.success));
+
             emit(state.copyWith(statusRegisterOrUpdate: BlocStatus.success));
           },
           onError: (e) {
@@ -274,6 +309,42 @@ class AddEventBloc extends Bloc<AddEventEvent, AddEventState> {
         );
       }
     }
+  }
+
+  Future _cancelScheduleNotification(int id) async {
+    await AlarmManagerService.cancelScheduleTaskPushNotification(id);
+  }
+
+  Future<int> _addScheduleWhenAddNewEvent(
+      DateTime dateTime,
+      TimeOfDay hourStart,
+      String title,
+      String body,
+      int remindTypeBefore,
+      List<String> uuids,
+      String eventId) async {
+    int hour = hourStart.hour;
+    int minute = hourStart.minute;
+
+    if (minute - remindTypeBefore < 0) {
+      if (hour - 1 < 0) {
+        minute = 0;
+      } else {
+        hour -= 1;
+        minute = 60 - (remindTypeBefore - minute);
+      }
+    } else {
+      minute -= remindTypeBefore;
+    }
+
+    final dateTimePushNotification =
+        DateTime(dateTime.year, dateTime.month, dateTime.day, hour, minute);
+    final id = TimestampUtil.getTimeStampIntType(dateTimePushNotification);
+
+    AlarmManagerService.scheduleTaskForPushNotificationToOtherUser(
+        dateTimePushNotification, uuids, title, body, id, eventId);
+
+    return id;
   }
 
   bool _isValidateSuccessInput(Emitter<AddEventState> emit) {

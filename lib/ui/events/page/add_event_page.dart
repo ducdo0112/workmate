@@ -22,16 +22,34 @@ import '../../../main/main_dev.dart';
 import '../../../model/user/user_info_data.dart';
 import '../widget/input_form_with_add_user.dart';
 
-class AddEventPage extends StatelessWidget {
+class AddEventPage extends StatefulWidget {
   final AddEventPageArgs args;
 
   const AddEventPage({Key? key, required this.args}) : super(key: key);
 
   @override
+  State<AddEventPage> createState() => _AddEventPageState();
+}
+
+class _AddEventPageState extends State<AddEventPage> {
+
+  @override
+  void initState() {
+    isAddEventPage = true;
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    isAddEventPage = false;
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocProvider(
         create: (context) => getIt<AddEventBloc>()
-          ..add(AddEventFetched(args.eventId, args.dateTime)),
+          ..add(AddEventFetched(widget.args.eventId, widget.args.dateTime)),
         child: createBlocConsumer<AddEventEvent, AddEventState, AddEventBloc>(
           usingFullBackgroundLoadingDialog: true,
           listener: (p0, p1) {

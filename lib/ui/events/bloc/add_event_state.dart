@@ -50,6 +50,8 @@ class AddEventState extends BaseState {
 
   final String eventId;
 
+  final int? notificationId;
+
   const AddEventState({
     BlocStatus status = BlocStatus.initial,
     NetworkException? exception,
@@ -82,6 +84,7 @@ class AddEventState extends BaseState {
     this.linkPdfFileInEditMode = '',
     this.eventId = '',
     this.isOverLapTime = false,
+    this.notificationId,
   }) : super(status: status, exception: exception);
 
   AddEventState copyWith({
@@ -116,6 +119,7 @@ class AddEventState extends BaseState {
     String? linkPdfFileInEditMode,
     String? eventId,
     bool? isOverLapTime,
+    int? notificationId,
   }) =>
       AddEventState(
         status: status ?? this.status,
@@ -153,6 +157,7 @@ class AddEventState extends BaseState {
             linkPdfFileInEditMode ?? this.linkPdfFileInEditMode,
         eventId: eventId ?? this.eventId,
         isOverLapTime: isOverLapTime ?? this.isOverLapTime,
+        notificationId: notificationId ?? this.notificationId,
       );
 
   String getListNameUserFromListUserSelected() {
@@ -209,6 +214,7 @@ class AddEventState extends BaseState {
       linkPdfFileInEditMode,
       fileNamePdfInEditMode,
       eventId,
-      isOverLapTime
+      isOverLapTime,
+      notificationId
     ]);
 }

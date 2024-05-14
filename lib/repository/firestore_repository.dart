@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:workmate/model/event/event.dart';
 import 'package:workmate/model/group/group.dart';
+import 'package:workmate/model/notification/notification_item.dart';
 import 'package:workmate/model/user/user_info_data.dart';
 import 'package:workmate/utils/timestamp.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -23,6 +24,8 @@ class FireStoreRepository {
       FirebaseFirestore.instance.collection("groups");
   final CollectionReference eventsCollection =
       FirebaseFirestore.instance.collection("events");
+  final CollectionReference notificationsCollection =
+      FirebaseFirestore.instance.collection("notifications");
 
   // saving the userdata
   Future savingUserdata(String fullname, String email) async {
@@ -37,16 +40,35 @@ class FireStoreRepository {
     });
   }
 
-  Future testestIsolate() async {
-    return await userCollection
-        .doc("J1Fpt6mlr5YsXHHQ678hpjDZeKE3")
-        .update({"fullName": "today3", "status": "Vắng mặt"});
-  }
-
   Future updateUserdata(
       String fullname, String profilePic, String status) async {
     return await userCollection.doc(uid).update(
         {"fullName": fullname, "profilePic": profilePic, "status": status});
+  }
+
+  Future updateFcmTokenForUser(String uuidUser, String fcmToken) async {
+    return await userCollection.doc(uuidUser).update({"fcmToken": fcmToken});
+  }
+
+  Future addNotificationDateOnServer(int id, String title, String body,
+      List<String> uuids, String eventId) async {
+    await notificationsCollection.doc('$id').set({
+      'title': title,
+      'body': body,
+      'id': id,
+      'users': FieldValue.arrayUnion(uuids),
+      'eventId': eventId,
+    });
+  }
+
+  Future<NotificationItem> findNotificationById(int id) async {
+    DocumentSnapshot doc = await notificationsCollection.doc('$id').get();
+    return NotificationItem.fromJson(doc.data() as Map<String, dynamic>);
+  }
+
+  Future<UserInfoData> findUserByUid(String uid) async {
+    DocumentSnapshot doc = await userCollection.doc(uid).get();
+    return UserInfoData.fromJson(doc.data() as Map<String, dynamic>);
   }
 
   Future<Event> findEventById(DateTime dateTime, String id) async {
@@ -160,7 +182,7 @@ class FireStoreRepository {
     return eventsCollection.doc(date).collection("list_events").snapshots();
   }
 
-  Future addNewEvent({
+  Future<String> addNewEvent({
     required String title,
     required String note,
     required DateTime dateTime,
@@ -196,9 +218,21 @@ class FireStoreRepository {
     newEvent.update({
       "id": newEvent.id,
     });
+
+    return newEvent.id;
   }
 
-  Future updateEvent({
+  Future updateNotificationIdForEvent(DateTime dateTime, String eventId, int notificationId) async {
+    String dateTimeString = TimestampUtil.formatTimeDDMMYYYY(dateTime);
+    print("dongnd1 time updateNotificationIdForEvent: $dateTimeString");
+    await eventsCollection
+        .doc(dateTimeString)
+        .collection("list_events")
+        .doc(eventId)
+        .update({"notificationId": notificationId});
+  }
+
+  Future<String> updateEvent({
     required String id,
     required String title,
     required String note,
@@ -217,10 +251,17 @@ class FireStoreRepository {
     String dateTimeString = TimestampUtil.formatTimeDDMMYYYY(dateTime);
     print("dongnd1 time: $dateTimeString");
 
-    DocumentSnapshot documentSnapshot =
-    await eventsCollection.doc(dateTimeString).collection("list_events").doc(id).get();
-    if(documentSnapshot.data() != null) {
-      await eventsCollection.doc(dateTimeString).collection("list_events").doc(id).update({
+    DocumentSnapshot documentSnapshot = await eventsCollection
+        .doc(dateTimeString)
+        .collection("list_events")
+        .doc(id)
+        .get();
+    if (documentSnapshot.data() != null) {
+      await eventsCollection
+          .doc(dateTimeString)
+          .collection("list_events")
+          .doc(id)
+          .update({
         "id": id,
         "title": title,
         "note": note,
@@ -234,11 +275,20 @@ class FireStoreRepository {
         "urlPdfFile": urlPdfFile,
         "fileName": fileName,
       });
-      await eventsCollection.doc(dateTimeString).collection("list_events").doc(id).update({
+      await eventsCollection
+          .doc(dateTimeString)
+          .collection("list_events")
+          .doc(id)
+          .update({
         "users": FieldValue.arrayUnion(uuidUser),
       });
+
+      return id;
     } else {
-      DocumentReference newEvent = await eventsCollection.doc(dateTimeString).collection("list_events").add({
+      DocumentReference newEvent = await eventsCollection
+          .doc(dateTimeString)
+          .collection("list_events")
+          .add({
         "id": "",
         "title": title,
         "note": note,
@@ -258,7 +308,13 @@ class FireStoreRepository {
       });
 
       String oldDateTimeString = TimestampUtil.formatTimeDDMMYYYY(oldDate);
-      await eventsCollection.doc(oldDateTimeString).collection("list_events").doc(id).delete();
+      await eventsCollection
+          .doc(oldDateTimeString)
+          .collection("list_events")
+          .doc(id)
+          .delete();
+
+      return newEvent.id;
     }
 
     // DocumentReference newEvent = await eventsByDate.add({

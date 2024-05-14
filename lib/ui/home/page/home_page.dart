@@ -1,6 +1,7 @@
 import 'package:awesome_bottom_bar/awesome_bottom_bar.dart';
 import 'package:awesome_bottom_bar/tab_item.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:workmate/common/color/app_color.dart';
 import 'package:workmate/main/main_dev.dart';
 import 'package:workmate/ui/calendar/page/calendar_page.dart';
@@ -13,6 +14,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../account_info/page/account_info_page.dart';
 
 
+var notificationStreamController = PublishSubject();
 
 class HomePage extends StatefulWidget {
 
@@ -51,6 +53,9 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    notificationStreamController.listen((value) async {
+
+    });
   }
 
   @override
@@ -111,5 +116,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     super.dispose();
+    notificationStreamController.close();
   }
 }

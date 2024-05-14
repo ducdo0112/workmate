@@ -8,6 +8,16 @@ class TimestampUtil {
     return ' timestamp: ${now.hour}:${now.minute}:${now.second}.${now.millisecond}';
   }
 
+
+  static int getCurrentTimeStampIntType() {
+    DateTime now = DateTime.now();
+    return (now.millisecondsSinceEpoch)~/1000;
+  }
+
+  static int getTimeStampIntType(DateTime dateTime) {
+    return (dateTime.millisecondsSinceEpoch)~/1000;
+  }
+
   static String getCurrentTimeStampInMilliseconds() {
     return DateTime.now().millisecondsSinceEpoch.toString();
   }

@@ -1,6 +1,7 @@
 import 'package:workmate/common/bloc/call_api.dart';
 import 'package:workmate/model/enum/bloc_status.dart';
 import 'package:workmate/repository/auth_repository.dart';
+import 'package:workmate/service/firebase/firebase_remote_message_service.dart';
 import 'package:workmate/ui/login/bloc/login_event.dart';
 import 'package:workmate/ui/login/bloc/login_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -63,7 +64,11 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
         if (loginCredential != null) {
           emit(state.copyWith(status: BlocStatus.success));
-          await SharedPreferencesHelper.setStringType(SharedPreferencesHelper.keyEmail, state.email);
+          await SharedPreferencesHelper.setStringType(
+              SharedPreferencesHelper.keyEmail, state.email);
+          await FirebaseRemoteMessageService()
+              .updateFcmTokenOnServerAfterLoginOrRegister(
+                  loginCredential.user?.uid ?? '');
         } else {
           emit(state.copyWith(status: BlocStatus.error));
         }

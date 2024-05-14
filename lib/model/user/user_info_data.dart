@@ -10,16 +10,20 @@ class UserInfoData {
   final String profilePic;
   final String uid;
   final String status;
+  final String? fcmToken;
 
-  UserInfoData(this.fullName, this.email, this.profilePic, this.uid, this.status);
+  UserInfoData(this.fullName, this.email, this.profilePic, this.uid,
+      this.status, this.fcmToken);
 
   factory UserInfoData.fromQuerySnapshot(QuerySnapshot snapshot) {
     return UserInfoData(
-        snapshot.docs[0]['fullName'],
-        snapshot.docs[0]['email'],
-        snapshot.docs[0]['profilePic'],
-        snapshot.docs[0]['uid'],
-        snapshot.docs[0]['status']);
+      snapshot.docs[0]['fullName'],
+      snapshot.docs[0]['email'],
+      snapshot.docs[0]['profilePic'],
+      snapshot.docs[0]['uid'],
+      snapshot.docs[0]['status'],
+      snapshot.docs[0]['fcmToken'],
+    );
   }
 
   factory UserInfoData.fromJson(Map<String, dynamic> json) =>

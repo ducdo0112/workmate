@@ -9,6 +9,8 @@ import 'package:workmate/ui/register/bloc/register_state.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../service/firebase/firebase_remote_message_service.dart';
+
 part 'register_event.dart';
 
 class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
@@ -72,6 +74,9 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
             //call data base to update the date
             await FireStoreRepository(uid: userCredential.user?.uid).savingUserdata(state.username, state.email);
             await SharedPreferencesHelper.setStringType(SharedPreferencesHelper.keyEmail, state.email);
+            await FirebaseRemoteMessageService()
+                .updateFcmTokenOnServerAfterLoginOrRegister(
+                userCredential.user?.uid ?? '');
             emit(state.copyWith(status: BlocStatus.success));
           } else {
             emit(state.copyWith(status: BlocStatus.error));

@@ -81,11 +81,13 @@ class AccountInfoBloc extends Bloc<AccountInfoEvent, AccountInfoState> {
     String img64 = base64Encode(bytes);
     final currentUserAfterModify = state.userAfterModify;
     final userAfterModify = UserInfoData(
-        currentUserAfterModify?.fullName ?? '',
-        currentUserAfterModify?.email ?? '',
-        img64,
-        currentUserAfterModify?.uid ?? '',
-        currentUserAfterModify?.status ?? '');
+      currentUserAfterModify?.fullName ?? '',
+      currentUserAfterModify?.email ?? '',
+      img64,
+      currentUserAfterModify?.uid ?? '',
+      currentUserAfterModify?.status ?? '',
+      currentUserAfterModify?.fcmToken ?? '',
+    );
     emit(state.copyWith(userAfterModify: userAfterModify));
   }
 
@@ -134,11 +136,13 @@ class AccountInfoBloc extends Bloc<AccountInfoEvent, AccountInfoState> {
   ) async {
     final currentUserAfterModify = state.userAfterModify;
     final userAfterModify = UserInfoData(
-        event.username ?? '',
-        currentUserAfterModify?.email ?? '',
-        currentUserAfterModify?.profilePic ?? '',
-        currentUserAfterModify?.uid ?? '',
-        currentUserAfterModify?.status ?? '');
+      event.username ?? '',
+      currentUserAfterModify?.email ?? '',
+      currentUserAfterModify?.profilePic ?? '',
+      currentUserAfterModify?.uid ?? '',
+      currentUserAfterModify?.status ?? '',
+      currentUserAfterModify?.fcmToken ?? '',
+    );
     emit(state.copyWith(userAfterModify: userAfterModify));
   }
 
@@ -163,11 +167,13 @@ class AccountInfoBloc extends Bloc<AccountInfoEvent, AccountInfoState> {
         SharedPreferencesHelper.keyStatus, event.status ?? "Online");
     final currentUserAfterModify = state.userAfterModify;
     final userAfterModify = UserInfoData(
-        currentUserAfterModify?.fullName ?? '',
-        currentUserAfterModify?.email ?? '',
-        currentUserAfterModify?.profilePic ?? '',
-        currentUserAfterModify?.uid ?? '',
-        event.status ?? "Online");
+      currentUserAfterModify?.fullName ?? '',
+      currentUserAfterModify?.email ?? '',
+      currentUserAfterModify?.profilePic ?? '',
+      currentUserAfterModify?.uid ?? '',
+      event.status ?? "Online",
+      currentUserAfterModify?.fcmToken ?? '',
+    );
     emit(state.copyWith(
         userStatus: event.status, userAfterModify: userAfterModify));
   }

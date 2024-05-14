@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:workmate/common/widget/base_page.dart';
 import 'package:workmate/model/event/event.dart';
 import 'package:workmate/routing/app_routing.dart';
+import 'package:workmate/service/firebase/firebase_remote_message_service.dart';
 import 'package:workmate/ui/calendar/bloc/calender_bloc.dart';
 import 'package:workmate/ui/calendar/bloc/calender_event.dart';
 import 'package:workmate/ui/calendar/bloc/calender_state.dart';
@@ -15,6 +16,7 @@ import 'package:workmate/utils/timestamp.dart';
 import '../../../common/bloc/bloc_consumer_creation.dart';
 import '../../../common/color/app_color.dart';
 import '../../../main/main_dev.dart';
+import '../../../service/firebase/alarm_manager_service.dart';
 import '../widget/calendar_avatar_header.dart';
 import '../widget/horizontal_calendar.dart';
 
@@ -46,7 +48,17 @@ class _CalendarPageState extends State<CalendarPage> {
               resizeToAvoidBottomInset: false,
               showFloatingActionButton: true,
               body: _buildBodyWidget(state, context),
-              floatingButtonAction: () {
+              floatingButtonAction: () async {
+                // FirebaseRemoteMessageService.callOnFcmApiSendPushNotifications(
+                //   ["fMbiTfQQSqeBjZjgkjo4vf:APA91bH-oj-NbPIiJML3XG_lv5hWFZGpBJsCSXOM5LMgTIY_1UnQ-Q3OhkxUdctab8KhgUxFRVfLNWIahGwQQhlKEJXWaDWYePxX-yaj_LCzet5kHPdrX-rhypZE2EaJKpwk_FkhciIm"],
+                //   "hi",
+                //   "ho",
+                // );
+                //  int id = TimestampUtil.getCurrentTimeStampIntType();
+                // final dateTime = DateTime(2024, 5, 14, 14, 23);
+                // print("dongnd1 test date: ${dateTime}");
+                //FirebaseRemoteMessageService.scheduleNotification(id, "a", "b", dateTime);
+               // await AlarmManagerService.scheduleTaskForPushNotificationToOtherUser(dateTime, ["hcfIEURtX1U82yOBKqtcgtCfByx1"], "a", "b", id);
                 Navigator.of(context).pushNamed(RouteDefine.addEvent.name,
                     arguments: AddEventPageArgs(
                       eventId: null,
