@@ -18,7 +18,7 @@ class AccountInfoState extends BaseState {
     this.updateStatus = BlocStatus.initial,
     this.logoutStatus = BlocStatus.initial,
     this.isErrorValidateName = false,
-    this.userStatus = "Online",
+    this.userStatus = "Hoạt động",
   }) : super(status: status, exception: exception);
 
   AccountInfoState copyWith({

@@ -87,8 +87,10 @@ class _AccountInfoPageState extends State<AccountInfoPage>
                       isEdit: true,
                       onClicked: () async {
                         final ImagePicker picker = ImagePicker();
-                        final XFile? image =
-                            await picker.pickImage(source: ImageSource.gallery, maxWidth: 120, maxHeight: 120);
+                        final XFile? image = await picker.pickImage(
+                            source: ImageSource.gallery,
+                            maxWidth: 120,
+                            maxHeight: 120);
                         if (image != null) {
                           context
                               .read<AccountInfoBloc>()
@@ -240,17 +242,21 @@ class _AccountInfoPageState extends State<AccountInfoPage>
               value: state.userStatus,
               isDense: true,
               isExpanded: false,
-              items: [
+              items: const [
                 DropdownMenuItem(
-                    value: 'Online',
+                    value: 'Hoạt động',
                     child: Text(
-                      "Online",
+                      "Hoạt động",
                       style: TextStyle(
-                        fontSize: 16.sp,
+                        fontWeight: FontWeight.normal,
                       ),
                     )),
-                const DropdownMenuItem(
-                    value: "Vắng mặt", child: Text("Vắng mặt")),
+                DropdownMenuItem(
+                    value: "Vắng mặt",
+                    child: Text(
+                      "Vắng mặt",
+                      style: TextStyle(fontWeight: FontWeight.normal),
+                    )),
               ],
               onChanged: (newValue) {
                 context
@@ -280,7 +286,9 @@ class _AccountInfoPageState extends State<AccountInfoPage>
           borderSizeWidth: 1.w,
           circularProgressColor: AppColor.orangePeel,
           backgroundColorEnable: AppColor.white,
-          isEnable: state.hasAvatarChanged() || state.hasNameChanged() || state.hasStatusChanged(),
+          isEnable: state.hasAvatarChanged() ||
+              state.hasNameChanged() ||
+              state.hasStatusChanged(),
         );
       },
     );

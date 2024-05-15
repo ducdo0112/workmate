@@ -56,7 +56,7 @@ class AccountInfoBloc extends Bloc<AccountInfoEvent, AccountInfoState> {
           var status = await SharedPreferencesHelper.getStringType(
               SharedPreferencesHelper.keyStatus);
           if (status.isEmpty) {
-            status = "Online";
+            status = "Hoạt động";
           }
           emit(state.copyWith(
               status: BlocStatus.success,
@@ -105,7 +105,7 @@ class AccountInfoBloc extends Bloc<AccountInfoEvent, AccountInfoState> {
               .updateUserdata(
                   state.userAfterModify?.fullName ?? '',
                   state.userAfterModify?.profilePic ?? '',
-                  state.userAfterModify?.status ?? 'Online');
+                  state.userAfterModify?.status ?? 'Hoạt động');
 
           emit(state.copyWith(
               updateStatus: BlocStatus.success, user: state.userAfterModify));
@@ -164,14 +164,14 @@ class AccountInfoBloc extends Bloc<AccountInfoEvent, AccountInfoState> {
     Emitter<AccountInfoState> emit,
   ) async {
     await SharedPreferencesHelper.setStringType(
-        SharedPreferencesHelper.keyStatus, event.status ?? "Online");
+        SharedPreferencesHelper.keyStatus, event.status ?? "Hoạt động");
     final currentUserAfterModify = state.userAfterModify;
     final userAfterModify = UserInfoData(
       currentUserAfterModify?.fullName ?? '',
       currentUserAfterModify?.email ?? '',
       currentUserAfterModify?.profilePic ?? '',
       currentUserAfterModify?.uid ?? '',
-      event.status ?? "Online",
+      event.status ?? "Hoạt động",
       currentUserAfterModify?.fcmToken ?? '',
     );
     emit(state.copyWith(

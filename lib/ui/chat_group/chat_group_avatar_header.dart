@@ -21,7 +21,7 @@ class ChatGroupAvatarHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = status == "Online" ? Colors.green : Colors.grey;
+    final color = status == "Hoạt động" ? Colors.green : Colors.grey;
 
     return Center(
       child: Stack(

@@ -21,6 +21,31 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:http/http.dart' as http;
 
+@pragma('vm:entry-point')
+void notificationTapBackground(NotificationResponse notificationResponse) {
+  print("dongnd1 here: 1 $notificationResponse");
+  try {
+    final eventId = json.decode(notificationResponse.payload!)['event_id'];
+    navigateToDetailNotification(eventId);
+    print("dongnd1");
+  } catch (e) {}
+}
+
+void navigateToDetailNotification(eventId) {
+  final context = navigatorKey.currentContext;
+  if (context != null) {
+    if (isAddEventPage) {
+      Navigator.of(context).popAndPushNamed(RouteDefine.addEvent.name,
+          arguments:
+          AddEventPageArgs(eventId: eventId, dateTime: DateTime.now()));
+    } else {
+      Navigator.of(context).pushNamed(RouteDefine.addEvent.name,
+          arguments:
+          AddEventPageArgs(eventId: eventId, dateTime: DateTime.now()));
+    }
+  }
+}
+
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
 }
@@ -47,7 +72,7 @@ class FirebaseRemoteMessageService {
     try {
       final eventId = data['event_id'];
       if (eventId != null) {
-        _navigateToDetailNotification(eventId);
+        navigateToDetailNotification(eventId);
       }
     } catch (e) {
       ToastHelper.showToast("error when tap noti: $e");
@@ -60,7 +85,7 @@ class FirebaseRemoteMessageService {
     tz.setLocalLocation(tz.getLocation(timeZone));
   }
 
-  static void _navigateToDetailNotification(String eventId) {
+  static void navigateToDetailNotification(String eventId) {
     final context = navigatorKey.currentContext;
     if (context != null) {
       if (isAddEventPage) {
@@ -194,14 +219,7 @@ class FirebaseRemoteMessageService {
     );
   }
 
-  void notificationTapBackground(NotificationResponse notificationResponse) {
-    print("dongnd1 here: 1 $notificationResponse");
-    try {
-      final eventId = json.decode(notificationResponse.payload!)['event_id'];
-      _navigateToDetailNotification(eventId);
-      print("dongnd1");
-    } catch (e) {}
-  }
+
 
   void _listenerMessageOnForeground() {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {

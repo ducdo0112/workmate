@@ -181,7 +181,6 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
   }
 
   _buildAppBar() {
-    print("dongnd1 buildappbar");
     String displayAvatar = "";
     String emailDisplay = "";
     if (widget.userName == widget.username1) {
@@ -291,14 +290,16 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
                   data[index]['email'] == data[index - 1]['email'];
             }
             return MessageTile(
-                message: data[index]['message'],
-                sender: data[index]['sender'],
-                sentByMe: widget.userName == data[index]['sender'],
-                avatar: data[index]['avatar'],
-                isSameSenderBefore: isSameSenderBefore,
-                email: data[index]['email'],
-                status: getStatusUser(data[index]['email']),
-                isPrivateChat: widget.isPrivateGroup);
+              message: data[index]['message'],
+              sender: data[index]['sender'],
+              sentByMe: widget.userName == data[index]['sender'],
+              avatar: data[index]['avatar'],
+              isSameSenderBefore: isSameSenderBefore,
+              email: data[index]['email'],
+              status: getStatusUser(data[index]['email']),
+              isPrivateChat: widget.isPrivateGroup,
+              timeSendMessage: data[index]['time'],
+            );
           },
         );
       },
@@ -315,7 +316,7 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
       }
     }
 
-    return "Online";
+    return "Hoạt động";
   }
 
   sendMessage() {

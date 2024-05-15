@@ -36,7 +36,7 @@ class FireStoreRepository {
       "statusReadMessages": [],
       "profilePic": "",
       "uid": uid,
-      "status": "Online"
+      "status": "Hoạt động"
     });
   }
 
