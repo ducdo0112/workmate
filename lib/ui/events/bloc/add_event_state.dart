@@ -52,10 +52,12 @@ class AddEventState extends BaseState {
 
   final int? notificationId;
 
+  final bool isMainEvent;
+
   const AddEventState({
     BlocStatus status = BlocStatus.initial,
     NetworkException? exception,
-    this.isCreateNewEvent = false,
+    this.isCreateNewEvent = true,
     this.event,
     this.title = '',
     this.titleEdit = '',
@@ -85,6 +87,7 @@ class AddEventState extends BaseState {
     this.eventId = '',
     this.isOverLapTime = false,
     this.notificationId,
+    this.isMainEvent = false,
   }) : super(status: status, exception: exception);
 
   AddEventState copyWith({
@@ -120,6 +123,7 @@ class AddEventState extends BaseState {
     String? eventId,
     bool? isOverLapTime,
     int? notificationId,
+    bool? isMainEvent,
   }) =>
       AddEventState(
         status: status ?? this.status,
@@ -158,6 +162,7 @@ class AddEventState extends BaseState {
         eventId: eventId ?? this.eventId,
         isOverLapTime: isOverLapTime ?? this.isOverLapTime,
         notificationId: notificationId ?? this.notificationId,
+        isMainEvent: isMainEvent ?? this.isMainEvent,
       );
 
   String getListNameUserFromListUserSelected() {
@@ -179,8 +184,8 @@ class AddEventState extends BaseState {
         endHour != endHourEdit ||
         remindType != remindTypeEdit ||
         listUser != listUserEdit ||
-        tag != tagEdit || filePickerResultEdit != null
-    );
+        tag != tagEdit ||
+        filePickerResultEdit != null);
   }
 
   @override
@@ -215,6 +220,7 @@ class AddEventState extends BaseState {
       fileNamePdfInEditMode,
       eventId,
       isOverLapTime,
-      notificationId
+      notificationId,
+      isMainEvent,
     ]);
 }

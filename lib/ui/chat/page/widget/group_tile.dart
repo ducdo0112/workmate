@@ -42,9 +42,14 @@ class _GroupTileState extends State<GroupTile> {
     await FireStoreRepository()
         .getGroupMembers(widget.groupId)
         .then((snapshot) {
-      setState(() {
-        groups = snapshot;
-      });
+      Future.delayed(
+        Duration.zero,
+        () {
+          setState(() {
+            groups = snapshot;
+          });
+        },
+      );
     });
   }
 

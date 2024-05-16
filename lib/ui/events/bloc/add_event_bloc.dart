@@ -63,28 +63,38 @@ class AddEventBloc extends Bloc<AddEventEvent, AddEventState> {
           var listUser = await fireStoreRepository.getAllExceptMe();
           var listUserSelect = await fireStoreRepository
               .getAllUserInfoByListConditionExceptMe(eventDetail.users ?? []);
+          final email = await SharedPreferencesHelper.getStringType(
+              SharedPreferencesHelper.keyEmail);
+          QuerySnapshot userInfoSnapshot = await FireStoreRepository(
+                  uid: FirebaseAuth.instance.currentUser!.uid)
+              .gettingUserData(email);
+          final userAdmin = UserInfoData.fromQuerySnapshot(userInfoSnapshot);
+          final isMainEvent = eventDetail.uuidAdmin != null &&
+              eventDetail.uuidAdmin == userAdmin.uid;
           emit(state.copyWith(
-              status: BlocStatus.success,
-              isCreateNewEvent: false,
-              title: eventDetail.title,
-              titleEdit: eventDetail.title,
-              note: eventDetail.note,
-              noteEdit: eventDetail.note,
-              dateTime: dateTime,
-              dateTimeEdit: dateTime,
-              startHour: hourStart,
-              startHourEdit: hourStart,
-              endHour: hourEnd,
-              endHourEdit: hourEnd,
-              remindType: eventDetail.typeOfRemind,
-              remindTypeEdit: eventDetail.typeOfRemind,
-              listUser: listUserSelect,
-              listUserEdit: listUserSelect,
-              listUserForSelectedInit: listUser,
-              fileNamePdfInEditMode: eventDetail.fileName,
-              linkPdfFileInEditMode: eventDetail.urlPdfFile,
-              tag: eventDetail.tag,
-              tagEdit: eventDetail.tag));
+            status: BlocStatus.success,
+            isCreateNewEvent: false,
+            title: eventDetail.title,
+            titleEdit: eventDetail.title,
+            note: eventDetail.note,
+            noteEdit: eventDetail.note,
+            dateTime: dateTime,
+            dateTimeEdit: dateTime,
+            startHour: hourStart,
+            startHourEdit: hourStart,
+            endHour: hourEnd,
+            endHourEdit: hourEnd,
+            remindType: eventDetail.typeOfRemind,
+            remindTypeEdit: eventDetail.typeOfRemind,
+            listUser: listUserSelect,
+            listUserEdit: listUserSelect,
+            listUserForSelectedInit: listUser,
+            fileNamePdfInEditMode: eventDetail.fileName,
+            linkPdfFileInEditMode: eventDetail.urlPdfFile,
+            tag: eventDetail.tag,
+            tagEdit: eventDetail.tag,
+            isMainEvent: isMainEvent,
+          ));
         },
         onError: (e) {
           emit(state.copyWith(status: BlocStatus.error));
@@ -283,25 +293,30 @@ class AddEventBloc extends Bloc<AddEventEvent, AddEventState> {
               isChangeDate: isChangeDate,
               oldDate: state.dateTime!,
             );
-            // xoa notification o event cu
-            if(state.notificationId != null) {
-              print("Xoa schedule notification id: ${state.notificationId}");
-              await _cancelScheduleNotification(state.notificationId!);
+
+            if(state.dateTime != state.dateTimeEdit || state.startHour != state.startHourEdit) {
+              // xoa notification o event cu
+              if (state.notificationId != null) {
+                print("Xoa schedule notification id: ${state.notificationId}");
+                await _cancelScheduleNotification(state.notificationId!);
+              }
+
+              // tao notification moi va them vao
+              final idNotification = await _addScheduleWhenAddNewEvent(
+                state.dateTimeEdit!,
+                state.startHourEdit!,
+                state.titleEdit,
+                "Bắt đầu lúc: ${TimestampUtil.formatTimeHHMM(state.startHourEdit!)}",
+                state.remindTypeEdit,
+                uuids,
+                eventId,
+              );
+              await FireStoreRepository().updateNotificationIdForEvent(
+                  state.dateTimeEdit!, eventId, idNotification);
             }
 
-            // tao notification moi va them vao
-            final idNotification = await  _addScheduleWhenAddNewEvent(state.dateTimeEdit!,
-              state.startHourEdit!,
-              state.titleEdit,
-              "Bắt đầu lúc: ${TimestampUtil.formatTimeHHMM(state.startHourEdit!)}",
-              state.remindTypeEdit,
-              uuids,
-              eventId,);
-            await FireStoreRepository().updateNotificationIdForEvent(
-                state.dateTimeEdit!, eventId, idNotification);
             emit(state.copyWith(statusRegisterOrUpdate: BlocStatus.success));
 
-            emit(state.copyWith(statusRegisterOrUpdate: BlocStatus.success));
           },
           onError: (e) {
             emit(state.copyWith(statusRegisterOrUpdate: BlocStatus.error));

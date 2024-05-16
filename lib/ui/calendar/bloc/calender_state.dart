@@ -11,6 +11,7 @@ class CalendarState extends BaseState {
   final DateTime? endDateTimeOfMonthSelect;
 
   final Stream? eventsStream;
+  final bool needRebuildAppBar;
 
   const CalendarState({
     BlocStatus status = BlocStatus.initial,
@@ -20,6 +21,7 @@ class CalendarState extends BaseState {
     this.startDateTimeOfMonthSelect,
     this.endDateTimeOfMonthSelect,
     this.eventsStream,
+    this.needRebuildAppBar = false,
   }) : super(status: status, exception: exception);
 
   CalendarState copyWith({
@@ -29,7 +31,8 @@ class CalendarState extends BaseState {
     DateTime? dateTimeSelected,
     DateTime? startDateTimeOfMonthSelect,
     DateTime? endDateTimeOfMonthSelect,
-    Stream? eventsStream
+    Stream? eventsStream,
+    bool? needRebuildAppBar
   }) =>
       CalendarState(
         status: status ?? this.status,
@@ -41,6 +44,7 @@ class CalendarState extends BaseState {
             startDateTimeOfMonthSelect ?? this.startDateTimeOfMonthSelect,
         endDateTimeOfMonthSelect:
             endDateTimeOfMonthSelect ?? this.endDateTimeOfMonthSelect,
+        needRebuildAppBar: needRebuildAppBar ?? this.needRebuildAppBar,
       );
 
   @override
@@ -50,6 +54,7 @@ class CalendarState extends BaseState {
       dateTimeSelected,
       startDateTimeOfMonthSelect,
       endDateTimeOfMonthSelect,
-      eventsStream
+      eventsStream,
+      needRebuildAppBar
     ]);
 }

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,6 +32,8 @@ class CalendarPage extends StatefulWidget {
 class _CalendarPageState extends State<CalendarPage> {
   PreferredSizeWidget? appBar;
   bool hasBuildAppBarWithImage = false;
+  bool hasDateSelectedChange = false;
+  Widget? avatarIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -38,10 +42,13 @@ class _CalendarPageState extends State<CalendarPage> {
           ..add(CalendarEventInitFetched(DateTime.now())),
         child: createBlocConsumer<CalendarEvent, CalendarState, CalendarBloc>(
           listener: (p0, p1) {},
-          buildWhen: (previous, current) => previous.status != current.status,
+          buildWhen: (previous, current) =>
+              previous.status != current.status ||
+              previous.dateTimeSelected != current.dateTimeSelected ||
+              previous.needRebuildAppBar != current.needRebuildAppBar,
           builder: (context, state) {
             return buildBasePage(
-              appBar: _buildAppBar(state),
+              appBar: _buildAppBar(state, context),
               backgroundColor: AppColor.white,
               extendBodyBehindAppBar: true,
               showDrawer: false,
@@ -49,16 +56,6 @@ class _CalendarPageState extends State<CalendarPage> {
               showFloatingActionButton: true,
               body: _buildBodyWidget(state, context),
               floatingButtonAction: () async {
-                // FirebaseRemoteMessageService.callOnFcmApiSendPushNotifications(
-                //   ["fMbiTfQQSqeBjZjgkjo4vf:APA91bH-oj-NbPIiJML3XG_lv5hWFZGpBJsCSXOM5LMgTIY_1UnQ-Q3OhkxUdctab8KhgUxFRVfLNWIahGwQQhlKEJXWaDWYePxX-yaj_LCzet5kHPdrX-rhypZE2EaJKpwk_FkhciIm"],
-                //   "hi",
-                //   "ho",
-                // );
-                //  int id = TimestampUtil.getCurrentTimeStampIntType();
-                // final dateTime = DateTime(2024, 5, 14, 14, 23);
-                // print("dongnd1 test date: ${dateTime}");
-                //FirebaseRemoteMessageService.scheduleNotification(id, "a", "b", dateTime);
-               // await AlarmManagerService.scheduleTaskForPushNotificationToOtherUser(dateTime, ["hcfIEURtX1U82yOBKqtcgtCfByx1"], "a", "b", id);
                 Navigator.of(context).pushNamed(RouteDefine.addEvent.name,
                     arguments: AddEventPageArgs(
                       eventId: null,
@@ -88,21 +85,42 @@ class _CalendarPageState extends State<CalendarPage> {
     );
   }
 
-  PreferredSizeWidget _buildAppBar(CalendarState calendarState) {
-    if (appBar == null || !hasBuildAppBarWithImage) {
-      if(calendarState.user != null) {
+  PreferredSizeWidget _buildAppBar(
+      CalendarState calendarState, BuildContext context) {
+    if (avatarIcon == null && calendarState.user != null) {
+      avatarIcon = IconButton(
+        onPressed: () async {},
+        icon: CalendarAvatarHeader(
+          imageBase64: calendarState.user?.profilePic ?? '',
+        ),
+      );
+    }
+    if (true) {
+      if (calendarState.user != null) {
         hasBuildAppBarWithImage = true;
       }
+
+      if (hasDateSelectedChange) {
+        hasDateSelectedChange = false;
+      }
+
+      // if(calendarState.needRebuildAppBar) {
+      //   context.read<CalendarBloc>().add(const CalendarChangeStateRebuildAppbar(false));
+      // }
+      appBar = null;
+
       appBar = AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
-        leading: Padding(
-            padding: const EdgeInsets.all(8),
-            child: CalendarAvatarHeader(
-              imageBase64: calendarState.user?.profilePic ?? '',
-            )),
-        title: Text(TimestampUtil.getNameOfMonthInVietName(
-            calendarState.dateTimeSelected ?? DateTime.now())),
+        leading: avatarIcon,
+        title: GestureDetector(
+          onTap: () {
+            _showDatePicker(context, calendarState);
+          },
+          child: Text(TimestampUtil.getNameOfMonthInVietName(
+            calendarState.dateTimeSelected ?? DateTime.now(),
+          )),
+        ),
         systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarIconBrightness: Brightness.dark,
           statusBarBrightness: Brightness.light,
@@ -112,10 +130,27 @@ class _CalendarPageState extends State<CalendarPage> {
     return appBar!;
   }
 
+  _showDatePicker(BuildContext context, CalendarState calendarState) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: calendarState.dateTimeSelected ?? DateTime.now(),
+      firstDate: DateTime(2015, 8),
+      lastDate: DateTime(2101),
+      locale: Locale('vi', 'VN'),
+    );
+
+    if (picked != null) {
+      hasDateSelectedChange = true;
+      context.read<CalendarBloc>().add(CalendarEventInitFetched(picked));
+    }
+    print("dongnd1 picker: $picked");
+  }
+
   _buildHorizontalDateTimeView(
       CalendarState calendarState, BuildContext context) {
     return BlocBuilder<CalendarBloc, CalendarState>(
-      buildWhen: (previous, current) => false,
+      buildWhen: (previous, current) =>
+          previous.dateTimeSelected != current.dateTimeSelected,
       builder: (context, state) {
         return Column(
           children: [
@@ -127,6 +162,7 @@ class _CalendarPageState extends State<CalendarPage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: HorizontalCalendar(
+                initDateTime: state.dateTimeSelected,
                 daySelect: (DateTime dateTime) {
                   context
                       .read<CalendarBloc>()
@@ -166,7 +202,7 @@ class _CalendarPageState extends State<CalendarPage> {
                       element.users?.contains(state.user?.uid) ?? false)
                   .toList();
               test2.sort((a, b) => mySortComparison(a.hourStart, b.hourStart));
-              if(test2.isEmpty) {
+              if (test2.isEmpty) {
                 return Container(
                   width: double.infinity,
                   height: double.infinity,
@@ -206,8 +242,10 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   int mySortComparison(String timeOfDay1String, String timeOfDay2String) {
-    TimeOfDay timeOfDay1 = TimestampUtil.convertStringToTimeOfDay(timeOfDay1String)!;
-    TimeOfDay timeOfDay2 = TimestampUtil.convertStringToTimeOfDay(timeOfDay2String)!;
+    TimeOfDay timeOfDay1 =
+        TimestampUtil.convertStringToTimeOfDay(timeOfDay1String)!;
+    TimeOfDay timeOfDay2 =
+        TimestampUtil.convertStringToTimeOfDay(timeOfDay2String)!;
     final propertyA = timeOfDay1.hour * 60 + timeOfDay1.minute;
     final propertyB = timeOfDay2.hour * 60 + timeOfDay2.minute;
     if (propertyA < propertyB) {

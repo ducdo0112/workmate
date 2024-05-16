@@ -32,7 +32,6 @@ class AddEventPage extends StatefulWidget {
 }
 
 class _AddEventPageState extends State<AddEventPage> {
-
   @override
   void initState() {
     isAddEventPage = true;
@@ -93,26 +92,44 @@ class _AddEventPageState extends State<AddEventPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 120),
-            _buildHeader(addEventState),
-            const SizedBox(height: 24),
-            _buildTitle(context),
-            const SizedBox(height: 20),
-            _buildNote(context),
-            const SizedBox(height: 20),
-            _buildSelectDate(),
-            const SizedBox(height: 20),
-            _buildSelectTime(),
-            const SizedBox(height: 20),
-            _buildSelectRemind(),
-            const SizedBox(height: 20),
-            _buildListUser(),
-            const SizedBox(height: 20),
+            IgnorePointer(
+              ignoring:
+                  !addEventState.isMainEvent && !addEventState.isCreateNewEvent,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 120),
+                  _buildHeader(addEventState),
+                  const SizedBox(height: 24),
+                  _buildTitle(context),
+                  const SizedBox(height: 20),
+                  _buildNote(context),
+                  const SizedBox(height: 20),
+                  _buildSelectDate(),
+                  const SizedBox(height: 20),
+                  _buildSelectTime(),
+                  const SizedBox(height: 20),
+                  _buildSelectRemind(),
+                  const SizedBox(height: 20),
+                  _buildListUser(),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
             _buildSelectFilePdf(),
-            const SizedBox(height: 25),
-            _buildBottom(context),
-            const SizedBox(
-              height: 100,
+            IgnorePointer(
+              ignoring:
+                  !addEventState.isMainEvent && !addEventState.isCreateNewEvent,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 25),
+                  _buildBottom(context),
+                  const SizedBox(
+                    height: 100,
+                  )
+                ],
+              ),
             )
           ],
         ),
@@ -121,9 +138,22 @@ class _AddEventPageState extends State<AddEventPage> {
   }
 
   _buildHeader(AddEventState addEventState) {
-    return Text(
-      addEventState.isCreateNewEvent ? "Thêm task mới" : "Chi tiết task",
-      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          addEventState.isCreateNewEvent ? "Thêm task mới" : "Chi tiết task",
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+        ),
+        Visibility(
+            visible:
+                !addEventState.isMainEvent && !addEventState.isCreateNewEvent,
+            child: const Text(
+              "Bạn không được sửa task này, vì không phải là người tạo",
+              style: TextStyle(
+                  fontStyle: FontStyle.italic, fontSize: 12, color: Colors.red),
+            ))
+      ],
     );
   }
 
@@ -538,8 +568,11 @@ class _AddEventPageState extends State<AddEventPage> {
           buildWhen: (previous, current) => false,
           builder: (context, state) {
             return InputFormWithSelectFile(
+              key: UniqueKey(),
               fileNameInit: state.fileNamePdfInEditMode,
               linkFileInit: state.linkPdfFileInEditMode,
+              isMainEvent: state.isMainEvent,
+              isCreateNewEvent: state.isCreateNewEvent,
               suffixIcon: const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8),
                 child: Icon(Icons.open_in_new),

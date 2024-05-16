@@ -126,6 +126,7 @@ class TimestampUtil {
   }
 
   static String getNameOfMonthInVietName(DateTime dateTime) {
+    print("dongnd1 getNameOfMonthInVietName: $dateTime");
     switch (dateTime.month) {
       case 1:
         return "Tháng 1";

@@ -5,9 +5,13 @@ import 'package:workmate/common/color/app_color.dart';
 import '../../../model/calendar_item/calendar_item.dart';
 
 class HorizontalCalendar extends StatefulWidget {
-  const HorizontalCalendar({Key? key, required this.daySelect})
-      : super(key: key);
+  const HorizontalCalendar({
+    Key? key,
+    required this.daySelect,
+    this.initDateTime,
+  }) : super(key: key);
   final ValueChanged<DateTime> daySelect;
+  final DateTime? initDateTime;
 
   @override
   State<HorizontalCalendar> createState() => _HorizontalCalendarState();
@@ -22,23 +26,47 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
   @override
   void initState() {
     super.initState();
-    listDayOfMonth = getDaysOfMonth(DateTime.now());
-    selectedDateTime = DateTime.now();
+    listDayOfMonth = getDaysOfMonth(widget.initDateTime ?? DateTime.now());
+    selectedDateTime = widget.initDateTime ?? DateTime.now();
     indexDaySelect = selectedDateTime.day - 1;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollToItem(indexDaySelect);
     });
   }
 
+  @override
+  void didUpdateWidget(covariant HorizontalCalendar oldWidget) {
+    if(isDifferentMonthOrYearSelect(oldWidget.initDateTime ?? DateTime.now(), widget.initDateTime ?? DateTime.now())) {
+      scrollToItem(indexDaySelect);
+    }
+
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  bool isDifferentMonthOrYearSelect(DateTime dateTime1, DateTime dateTime2) {
+    if(dateTime1.year != dateTime2.year || dateTime1.month != dateTime2.month) {
+      return true;
+    }
+    return false;
+  }
+
   void scrollToItem(int index) {
     if (index > 5) {
       index = index - 2;
     }
-    _scrollController.animateTo(
-      index * 54.0,
-      duration: const Duration(milliseconds: 500), // Thời gian di chuyển
-      curve: Curves.easeInOut, // Kiểu di chuyển
-    );
+
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        index * 54.0,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 
   List<DateTime> getDaysOfMonth(DateTime month) {
@@ -64,6 +92,9 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
 
   @override
   Widget build(BuildContext context) {
+    listDayOfMonth = getDaysOfMonth(widget.initDateTime ?? DateTime.now());
+    selectedDateTime = widget.initDateTime ?? DateTime.now();
+    indexDaySelect = selectedDateTime.day - 1;
     return SizedBox(
       height: 80,
       child: ListView.builder(

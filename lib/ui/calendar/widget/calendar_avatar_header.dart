@@ -37,9 +37,7 @@ class CalendarAvatarHeader extends StatelessWidget {
           fit: BoxFit.cover,
           width: 45,
           height: 45,
-          child: InkWell(
-            onTap: () {},
-          ),
+          child: Container(),
         ),
       ),
     );

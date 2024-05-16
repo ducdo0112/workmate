@@ -17,6 +17,7 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
   CalendarBloc({required this.fireStoreRepository})
       : super(const CalendarState()) {
     on<CalendarEventInitFetched>(_onAccountInfoFetch);
+    on<CalendarChangeStateRebuildAppbar>(_onNeedRebuildAppBarStateChange);
   }
 
   Future<void> _onAccountInfoFetch(
@@ -54,6 +55,14 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
       },
     );
   }
+
+  void _onNeedRebuildAppBarStateChange(
+      CalendarChangeStateRebuildAppbar event,
+      Emitter<CalendarState> emit,
+      )  {
+    emit(state.copyWith(needRebuildAppBar: event.needRebuildAppBar));
+  }
+
 
   DateTime getMonthStartDate() {
     DateTime now = DateTime.now();

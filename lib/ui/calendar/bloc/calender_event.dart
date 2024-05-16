@@ -11,3 +11,12 @@ class CalendarEventInitFetched extends CalendarEvent {
   @override
   List<Object?> get props => [];
 }
+
+class CalendarChangeStateRebuildAppbar extends CalendarEvent {
+  final bool needRebuildAppBar;
+  const CalendarChangeStateRebuildAppbar(this.needRebuildAppBar);
+
+  @override
+  List<Object?> get props => [needRebuildAppBar];
+}
+
