@@ -281,11 +281,11 @@ class _AccountInfoPageState extends State<AccountInfoPage>
           },
           fontSize: 16.sp,
           fontWeight: FontWeight.w600,
-          textColorEnable: AppColor.black,
-          borderSizeColor: AppColor.black,
-          borderSizeWidth: 1.w,
+          textColorEnable: AppColor.white,
+          textColorDisable: AppColor.black,
+          backgroundColorDisable: AppColor.gainsBoro.withOpacity(0.5),
           circularProgressColor: AppColor.orangePeel,
-          backgroundColorEnable: AppColor.white,
+          backgroundColorEnable: AppColor.orangePeel,
           isEnable: state.hasAvatarChanged() ||
               state.hasNameChanged() ||
               state.hasStatusChanged(),

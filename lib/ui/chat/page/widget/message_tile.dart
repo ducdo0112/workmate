@@ -68,7 +68,7 @@ class _MessageTileState extends State<MessageTile> {
                         topRight: Radius.circular(20),
                         bottomRight: Radius.circular(20),
                       ),
-                color: widget.sentByMe ? AppColor.orangePeel : AppColor.grayX11,
+                color: widget.sentByMe ? AppColor.orangePeel : Colors.black12.withOpacity(0.1),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,7 +100,7 @@ class _MessageTileState extends State<MessageTile> {
                     widget.message,
                     textAlign:
                         widget.sentByMe ? TextAlign.right : TextAlign.left,
-                    style: const TextStyle(fontSize: 14, color: Colors.white),
+                    style:  TextStyle(fontSize: 14, color:  widget.sentByMe ? Colors.white: Colors.black),
                   )
                 ],
               ),
