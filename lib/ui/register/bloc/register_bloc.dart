@@ -1,7 +1,5 @@
 import 'package:workmate/common/bloc/call_api.dart';
 import 'package:workmate/model/enum/bloc_status.dart';
-import 'package:workmate/model/enum/register_step.dart';
-import 'package:workmate/model/enum/sex.dart';
 import 'package:workmate/repository/auth_repository.dart';
 import 'package:workmate/repository/firestore_repository.dart';
 import 'package:workmate/repository/shared_preferences_repository.dart';

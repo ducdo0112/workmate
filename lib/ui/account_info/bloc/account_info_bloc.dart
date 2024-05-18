@@ -1,17 +1,11 @@
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:image/image.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:workmate/common/bloc/base_state.dart';
 import 'package:workmate/common/bloc/call_api.dart';
-import 'package:workmate/model/account_info_response/account_info_response.dart';
-import 'package:workmate/model/age_response/age_response.dart';
-import 'package:workmate/model/city_response/city_response.dart';
 import 'package:workmate/model/enum/bloc_status.dart';
-import 'package:workmate/model/enum/user_status.dart';
 import 'package:workmate/model/http_raw/network_exception.dart';
-import 'package:workmate/model/pref_response/pref_response.dart';
 import 'package:workmate/model/user/user_info_data.dart';
 import 'package:workmate/repository/auth_repository.dart';
 import 'package:equatable/equatable.dart';

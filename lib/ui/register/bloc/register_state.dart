@@ -1,11 +1,6 @@
 import 'package:workmate/common/bloc/base_state.dart';
-import 'package:workmate/model/age_response/age_response.dart';
-import 'package:workmate/model/city_response/city_response.dart';
 import 'package:workmate/model/enum/bloc_status.dart';
-import 'package:workmate/model/enum/sex.dart';
 import 'package:workmate/model/http_raw/network_exception.dart';
-import 'package:workmate/model/pref_response/pref_response.dart';
-import 'package:workmate/model/register_user_code_response/register_user_code_response.dart';
 
 class RegisterState extends BaseState {
   final String username;
