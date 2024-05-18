@@ -1,17 +1,14 @@
 import 'package:workmate/common/color/app_color.dart';
 import 'package:workmate/common/image/app_images.dart';
 import 'package:workmate/common/widget/base_page.dart';
-import 'package:workmate/generated/l10n.dart';
 import 'package:workmate/main/main_dev.dart';
 import 'package:workmate/model/enum/bloc_status.dart';
 import 'package:workmate/routing/app_routing.dart';
 import 'package:workmate/ui/login/bloc/login_bloc.dart';
 import 'package:workmate/ui/login/bloc/login_state.dart';
-import 'package:workmate/ui/login/widget/header_title.dart';
 import 'package:workmate/ui/login/widget/login_button.dart';
 import 'package:workmate/ui/login/widget/password_input.dart';
 import 'package:workmate/ui/login/widget/start_gift_button.dart';
-import 'package:workmate/ui/login/widget/terms_of_use_button.dart';
 import 'package:workmate/ui/login/widget/email_input.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -52,10 +49,17 @@ class LoginPage extends StatelessWidget {
       create: (context) => getIt<LoginBloc>(),
       child: BlocListener<LoginBloc, LoginState>(
         listener: (context, state) async {
-          if (state.status == BlocStatus.success) {
+          if (state.status == BlocStatus.success && state.isAdmin == false) {
+            print("Checking: on if 1");
             Navigator.of(context).pushNamedAndRemoveUntil(
               RouteDefine.home.name,
               (Route<dynamic> route) => false,
+            );
+          } else if (state.status == BlocStatus.success && state.isAdmin == true) {
+            print("Checking: on else 1");
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              RouteDefine.adminHome.name,
+                  (Route<dynamic> route) => false,
             );
           }
         },

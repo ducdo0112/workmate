@@ -51,8 +51,8 @@ class RegisterAccountPage extends StatelessWidget {
         listener: (context, state) {
           if (state.status == BlocStatus.success) {
             Navigator.of(context).pushNamedAndRemoveUntil(
-              RouteDefine.home.name,
-              (Route<dynamic> route) => false,
+              RouteDefine.login.name,
+                  (route) => false,
             );
           }
         },

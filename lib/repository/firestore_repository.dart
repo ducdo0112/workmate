@@ -36,7 +36,8 @@ class FireStoreRepository {
       "statusReadMessages": [],
       "profilePic": "",
       "uid": uid,
-      "status": "Hoạt động"
+      "status": "Hoạt động",
+      "isAdmin": false,
     });
   }
 

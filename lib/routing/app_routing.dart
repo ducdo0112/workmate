@@ -6,12 +6,15 @@ import 'package:workmate/ui/login/page/login_page.dart';
 import 'package:workmate/ui/register/page/register_account_page.dart';
 import 'package:flutter/cupertino.dart';
 
+import '../ui/admin_home/page/admin_home_page.dart';
+
 enum RouteDefine {
   login,
   home,
   register,
   addChatGroup,
   addEvent,
+  adminHome
 }
 
 class AppRouting {
@@ -19,6 +22,7 @@ class AppRouting {
     final routes = <String, WidgetBuilder>{
       RouteDefine.login.name: (_) => const LoginPage(),
       RouteDefine.home.name: (_) => HomePage(),
+      RouteDefine.adminHome.name: (_) => AdminHomePage(),
       RouteDefine.register.name: (_) => const RegisterAccountPage(),
       RouteDefine.addChatGroup.name: (_) => AddChatGroupPage(
           isAddGroupChat:

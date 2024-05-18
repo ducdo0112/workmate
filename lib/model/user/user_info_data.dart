@@ -11,9 +11,10 @@ class UserInfoData {
   final String uid;
   final String status;
   final String? fcmToken;
+  final bool isAdmin;
 
   UserInfoData(this.fullName, this.email, this.profilePic, this.uid,
-      this.status, this.fcmToken);
+      this.status, this.fcmToken, this.isAdmin);
 
   factory UserInfoData.fromQuerySnapshot(QuerySnapshot snapshot) {
     return UserInfoData(
@@ -23,6 +24,7 @@ class UserInfoData {
       snapshot.docs[0]['uid'],
       snapshot.docs[0]['status'],
       snapshot.docs[0]['fcmToken'],
+      snapshot.docs[0]['isAdmin']
     );
   }
 

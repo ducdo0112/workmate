@@ -38,7 +38,7 @@ class _SelectUserState extends State<SelectUser> {
         final item = listUserInfo[index];
         final isSelected = userSelected
             .firstWhere((element) => element.uid == item.uid,
-                orElse: () => UserInfoData("", "", "", "", "", ""))
+                orElse: () => UserInfoData("", "", "", "", "", "", false))
             .uid
             .isNotEmpty;
         return ListTile(

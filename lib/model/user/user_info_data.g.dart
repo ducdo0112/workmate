@@ -13,6 +13,7 @@ UserInfoData _$UserInfoDataFromJson(Map<String, dynamic> json) => UserInfoData(
       json['uid'] as String,
       json['status'] as String,
       json['fcmToken'] as String?,
+      json['isAdmin'] as bool,
     );
 
 Map<String, dynamic> _$UserInfoDataToJson(UserInfoData instance) =>
@@ -23,4 +24,5 @@ Map<String, dynamic> _$UserInfoDataToJson(UserInfoData instance) =>
       'uid': instance.uid,
       'status': instance.status,
       'fcmToken': instance.fcmToken,
+      'isAdmin': instance.isAdmin
     };

@@ -81,6 +81,7 @@ class AccountInfoBloc extends Bloc<AccountInfoEvent, AccountInfoState> {
       currentUserAfterModify?.uid ?? '',
       currentUserAfterModify?.status ?? '',
       currentUserAfterModify?.fcmToken ?? '',
+      currentUserAfterModify?.isAdmin ?? false,
     );
     emit(state.copyWith(userAfterModify: userAfterModify));
   }
@@ -136,6 +137,7 @@ class AccountInfoBloc extends Bloc<AccountInfoEvent, AccountInfoState> {
       currentUserAfterModify?.uid ?? '',
       currentUserAfterModify?.status ?? '',
       currentUserAfterModify?.fcmToken ?? '',
+      currentUserAfterModify?.isAdmin ?? false,
     );
     emit(state.copyWith(userAfterModify: userAfterModify));
   }
@@ -167,6 +169,7 @@ class AccountInfoBloc extends Bloc<AccountInfoEvent, AccountInfoState> {
       currentUserAfterModify?.uid ?? '',
       event.status ?? "Hoạt động",
       currentUserAfterModify?.fcmToken ?? '',
+      currentUserAfterModify?.isAdmin ?? false,
     );
     emit(state.copyWith(
         userStatus: event.status, userAfterModify: userAfterModify));

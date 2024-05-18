@@ -6,6 +6,7 @@ class LoginState extends BaseState {
   final String email;
   final String password;
   final bool isShowPassword;
+  final bool isAdmin;
 
   // validate
   final bool isErrorInputEmail;
@@ -17,12 +18,13 @@ class LoginState extends BaseState {
     this.email = '',
     this.password = '',
     this.isShowPassword = false,
+    this.isAdmin = false,
     this.isErrorInputEmail = false,
     this.isErrorInputPassword = false,
   }) : super(
-          status: status,
-          exception: exception,
-        );
+    status: status,
+    exception: exception,
+  );
 
   LoginState copyWith({
     BlocStatus? status,
@@ -30,6 +32,7 @@ class LoginState extends BaseState {
     String? email,
     String? password,
     bool? isShowPassword,
+    bool? isAdmin,
     bool? isErrorInputEmail,
     bool? isErrorInputPassword,
   }) =>
@@ -39,6 +42,7 @@ class LoginState extends BaseState {
         email: email ?? this.email,
         password: password ?? this.password,
         isShowPassword: isShowPassword ?? this.isShowPassword,
+        isAdmin: isAdmin ?? this.isAdmin,
         isErrorInputEmail: isErrorInputEmail ?? this.isErrorInputEmail,
         isErrorInputPassword: isErrorInputPassword ?? this.isErrorInputPassword,
       );
@@ -49,6 +53,7 @@ class LoginState extends BaseState {
       email,
       password,
       isShowPassword,
+      isAdmin,
       isErrorInputEmail,
       isErrorInputPassword,
     ]);

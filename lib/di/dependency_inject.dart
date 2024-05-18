@@ -20,7 +20,7 @@ Future<void> setupDependency({String baseUrl = Const.baseUrlStg}) async {
   getIt.registerLazySingleton<AuthRepository>(
       () => AuthRepositoryImpl(networkRepository: getIt()));
   getIt.registerLazySingleton<FireStoreRepository>(() => FireStoreRepository());
-  getIt.registerFactory<LoginBloc>(() => LoginBloc(authRepository: getIt()));
+  getIt.registerFactory<LoginBloc>(() => LoginBloc(authRepository: getIt(), fireStoreRepository: getIt(), ));
   getIt.registerFactory<RegisterBloc>(
       () => RegisterBloc(authRepository: getIt()));
   getIt.registerFactory<HomeBloc>(() => HomeBloc(authRepository: getIt()));

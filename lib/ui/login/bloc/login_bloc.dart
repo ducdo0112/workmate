@@ -1,6 +1,7 @@
 import 'package:workmate/common/bloc/call_api.dart';
 import 'package:workmate/model/enum/bloc_status.dart';
 import 'package:workmate/repository/auth_repository.dart';
+import 'package:workmate/repository/firestore_repository.dart';
 import 'package:workmate/service/firebase/firebase_remote_message_service.dart';
 import 'package:workmate/ui/login/bloc/login_event.dart';
 import 'package:workmate/ui/login/bloc/login_state.dart';
@@ -10,10 +11,11 @@ import '../../../repository/shared_preferences_repository.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final AuthRepository authRepository;
+  final FireStoreRepository fireStoreRepository;
   final regExpEmailValidate = RegExp(
       r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
 
-  LoginBloc({required this.authRepository}) : super(const LoginState()) {
+  LoginBloc({required this.authRepository, required this.fireStoreRepository}) : super(const LoginState()) {
     on<LoginEventEmailChanged>(_onEmailChanged);
     on<LoginEventPasswordChanged>(_onPasswordChanged);
     on<LoginEventPressed>(_onLoginPressed);
@@ -63,7 +65,9 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         );
 
         if (loginCredential != null) {
-          emit(state.copyWith(status: BlocStatus.success));
+          final user = await fireStoreRepository.findUserByUid(loginCredential.user!.uid);
+          print("Check login credentials id: ${loginCredential.user?.uid}");
+          emit(state.copyWith(status: BlocStatus.success, isAdmin: user.isAdmin));
           await SharedPreferencesHelper.setStringType(
               SharedPreferencesHelper.keyEmail, state.email);
           await FirebaseRemoteMessageService()
