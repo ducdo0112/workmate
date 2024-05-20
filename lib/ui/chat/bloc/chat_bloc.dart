@@ -22,7 +22,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       onNoInternet: (e) {},
       onCallApi: () async {
         emit(state.copyWith(status: BlocStatus.loading));
-        final groups = await fireStoreRepository.getAllGroup();
+        final groups = await fireStoreRepository.getAllConversation();
       },
       onError: (e) {
         emit(state.copyWith(status: BlocStatus.error));

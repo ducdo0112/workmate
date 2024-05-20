@@ -1,28 +1,27 @@
 import 'package:workmate/common/bloc/base_state.dart';
+import 'package:workmate/model/conversation/conversation.dart';
 import 'package:workmate/model/enum/bloc_status.dart';
 import 'package:workmate/model/http_raw/network_exception.dart';
 
-import '../../../model/group/group.dart';
-
 class ChatState extends BaseState {
-  final List<Group> groups;
+  final List<Conversation> conversations;
   const ChatState({
     BlocStatus status = BlocStatus.initial,
     NetworkException? exception,
-    this.groups = const [],
+    this.conversations = const [],
   }) : super(status: status, exception: exception);
 
   ChatState copyWith({
     BlocStatus? status,
     NetworkException? exception,
-    List<Group>? groups,
+    List<Conversation>? conversations,
   }) =>
       ChatState(
         status: status ?? this.status,
         exception: exception ?? this.exception,
-        groups: groups ?? this.groups,
+        conversations: conversations ?? this.conversations,
       );
 
   @override
-  List<Object?> get props => super.props..addAll([groups]);
+  List<Object?> get props => super.props..addAll([conversations]);
 }

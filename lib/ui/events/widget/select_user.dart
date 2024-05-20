@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -38,7 +39,7 @@ class _SelectUserState extends State<SelectUser> {
         final item = listUserInfo[index];
         final isSelected = userSelected
             .firstWhere((element) => element.uid == item.uid,
-                orElse: () => UserInfoData("", "", "", "", "", "", false))
+                orElse: () => UserInfoData("", "", "", "", "", "", false, Timestamp.now()))
             .uid
             .isNotEmpty;
         return ListTile(

@@ -63,12 +63,12 @@ class AddChatGroupPage extends StatelessWidget {
             nextScreen(
                 context,
                 ChatGroupPage(
-                  groupId: p1.groupId,
-                  groupName: p1.groupName,
+                  conversationId: p1.conversationId,
+                  conversationName: p1.conversationName,
                   userName: p1.usernameAdmin,
                   avatar: p1.avatarAdmin,
                   email: p1.emailAdmin,
-                  isPrivateGroup: p1.isPrivateGroup,
+                  isPrivateConversation: p1.isPrivateConversation,
                   username1: p1.username1,
                   username2: p1.username2,
                   isAdmin: p1.isAdmin,
@@ -84,12 +84,12 @@ class AddChatGroupPage extends StatelessWidget {
             nextScreen(
                 context,
                 ChatGroupPage(
-                  groupId: p1.groupId,
-                  groupName: p1.groupName,
+                  conversationId: p1.conversationId,
+                  conversationName: p1.conversationName,
                   userName: p1.usernameAdmin,
                   avatar: p1.avatarAdmin,
                   email: p1.emailAdmin,
-                  isPrivateGroup: p1.isPrivateGroup,
+                  isPrivateConversation: p1.isPrivateConversation,
                   username1: p1.username1,
                   username2: p1.username2,
                   isAdmin: p1.isAdmin,
@@ -146,9 +146,9 @@ class AddChatGroupPage extends StatelessWidget {
   }
 
   _buildGroupNameInput(AddChatGroupState state, BuildContext context) {
-    final controller = TextEditingController(text: state.groupName);
+    final controller = TextEditingController(text: state.conversationName);
     controller.selection =
-        TextSelection.collapsed(offset: state.groupName.length);
+        TextSelection.collapsed(offset: state.conversationName.length);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

@@ -7,8 +7,8 @@ import "package:workmate/ui/chat_group/chat_group_page.dart";
 
 class GroupTile extends StatefulWidget {
   final String userName;
-  final String groupId;
-  final String groupName;
+  final String conversationId;
+  final String conversationName;
   final String avatar;
   final String email;
   final String currentUserName;
@@ -16,8 +16,8 @@ class GroupTile extends StatefulWidget {
 
   const GroupTile({
     Key? key,
-    required this.groupName,
-    required this.groupId,
+    required this.conversationName,
+    required this.conversationId,
     required this.userName,
     required this.avatar,
     required this.email,
@@ -40,7 +40,7 @@ class _GroupTileState extends State<GroupTile> {
 
   getGroupInfo() async {
     await FireStoreRepository()
-        .getGroupMembers(widget.groupId)
+        .getGroupMembers(widget.conversationId)
         .then((snapshot) {
       Future.delayed(
         Duration.zero,
@@ -64,12 +64,12 @@ class _GroupTileState extends State<GroupTile> {
               nextScreen(
                   context,
                   ChatGroupPage(
-                    groupId: widget.groupId,
-                    groupName: widget.groupName,
+                    conversationId: widget.conversationId,
+                    conversationName: widget.conversationName,
                     userName: widget.userName,
                     avatar: widget.avatar,
                     email: widget.email,
-                    isPrivateGroup: snapshot.data['isPrivateGroup'],
+                    isPrivateConversation: snapshot.data['isPrivateConversation'],
                     username1: snapshot.data['username1'],
                     username2: snapshot.data['username2'],
                     isAdmin: getName(snapshot.data['admin']) == widget.userName,
@@ -83,7 +83,7 @@ class _GroupTileState extends State<GroupTile> {
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
               child: ListTile(
                 leading: _buildAvatar(
-                  snapshot.data['isPrivateGroup'],
+                  snapshot.data['isPrivateConversation'],
                   widget.currentUserName,
                   snapshot.data['username1'],
                   snapshot.data['avatarUser1'],
@@ -91,14 +91,14 @@ class _GroupTileState extends State<GroupTile> {
                 ),
                 title: _buildTitle(
                   widget.currentUserName,
-                  snapshot.data['isPrivateGroup'],
+                  snapshot.data['isPrivateConversation'],
                   snapshot.data['username1'],
                   snapshot.data['username2'],
-                  widget.groupName,
+                  widget.conversationName,
                   snapshot.data['recentMessage'],
                 ),
                 trailing: Visibility(
-                  visible: widget.groupMessageUnread.contains(widget.groupId),
+                  visible: widget.groupMessageUnread.contains(widget.conversationId),
                   child: const Icon(
                     Icons.message,
                     color: Colors.green,
@@ -140,7 +140,7 @@ class _GroupTileState extends State<GroupTile> {
         radius: 30,
         backgroundColor: AppColor.orangePeel,
         child: Text(
-          widget.groupName.substring(0, 1).toUpperCase(),
+          widget.conversationName.substring(0, 1).toUpperCase(),
           textAlign: TextAlign.center,
           style:
               const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
@@ -162,7 +162,7 @@ class _GroupTileState extends State<GroupTile> {
       title = "Group: $group";
     } else {
       title =
-          "Trò chuyện với: ${currentUserName == username1 ? username2 : username1}";
+          currentUserName == username1 ? username2 : username1;
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

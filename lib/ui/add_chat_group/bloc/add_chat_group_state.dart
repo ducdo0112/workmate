@@ -11,8 +11,8 @@ class AddChatGroupState extends BaseState {
   final List<UserInfoData>? listUsersSelected;
   final bool shouldShowErrorInputNameGroup;
   final bool shouldShowErrorSelectUser;
-  final String groupName;
-  final String groupId;
+  final String conversationName;
+  final String conversationId;
   final String avatarAdmin;
   final String emailAdmin;
   final String usernameAdmin;
@@ -25,7 +25,7 @@ class AddChatGroupState extends BaseState {
   final String username2;
   final String avatarUser1;
   final String avatarUser2;
-  final bool isPrivateGroup;
+  final bool isPrivateConversation;
 
   final String emailUser1;
   final String emailUser2;
@@ -37,8 +37,8 @@ class AddChatGroupState extends BaseState {
     this.listUsersSelected = const [],
     this.shouldShowErrorInputNameGroup = false,
     this.shouldShowErrorSelectUser = false,
-    this.groupName = '',
-    this.groupId = '',
+    this.conversationName = '',
+    this.conversationId = '',
     this.avatarAdmin = '',
     this.emailAdmin = '',
     this.usernameAdmin = '',
@@ -50,7 +50,7 @@ class AddChatGroupState extends BaseState {
     this.avatarUser2 = '',
     this.emailUser1 = '',
     this.emailUser2 = '',
-    this.isPrivateGroup = false,
+    this.isPrivateConversation = false,
     this.isAdmin = false,
   }) : super(status: status, exception: exception);
 
@@ -63,8 +63,8 @@ class AddChatGroupState extends BaseState {
     List<UserInfoData>? listUsersSelected,
     bool? shouldShowErrorInputNameGroup,
     bool? shouldShowErrorSelectUser,
-    String? groupName,
-    String? groupId,
+    String? conversationName,
+    String? conversationId,
     String? avatarAdmin,
     String? emailAdmin,
     String? usernameAdmin,
@@ -74,7 +74,7 @@ class AddChatGroupState extends BaseState {
     String? avatarUser2,
     String? emailUser1,
     String? emailUser2,
-    bool? isPrivateGroup,
+    bool? isPrivateConversation,
     bool? isAdmin,
   }) =>
       AddChatGroupState(
@@ -88,14 +88,14 @@ class AddChatGroupState extends BaseState {
             shouldShowErrorInputNameGroup ?? this.shouldShowErrorInputNameGroup,
         shouldShowErrorSelectUser:
             shouldShowErrorSelectUser ?? this.shouldShowErrorSelectUser,
-        groupName: groupName ?? this.groupName,
-        groupId: groupId ?? this.groupId,
+        conversationName: conversationName ?? this.conversationName,
+        conversationId: conversationId ?? this.conversationId,
         avatarAdmin: avatarAdmin ?? this.avatarAdmin,
         emailAdmin: emailAdmin ?? this.emailAdmin,
         usernameAdmin: usernameAdmin ?? this.usernameAdmin,
         username1: username1 ?? this.username1,
         username2: username2 ?? this.username2,
-        isPrivateGroup: isPrivateGroup ?? this.isPrivateGroup,
+        isPrivateConversation: isPrivateConversation ?? this.isPrivateConversation,
         isAdmin: isAdmin ?? this.isAdmin,
         avatarUser1: avatarUser1 ?? this.avatarUser1,
         avatarUser2: avatarUser2 ?? this.avatarUser2,
@@ -110,8 +110,8 @@ class AddChatGroupState extends BaseState {
       listUsersSelected,
       shouldShowErrorSelectUser,
       shouldShowErrorInputNameGroup,
-      groupName,
-      groupId,
+      conversationName,
+      conversationId,
       avatarAdmin,
       emailAdmin,
       usernameAdmin,
@@ -119,7 +119,7 @@ class AddChatGroupState extends BaseState {
       statusCreatePrivateGroup,
       username1,
       username2,
-      isPrivateGroup,
+      isPrivateConversation,
       isAdmin,
       avatarUser2,
       avatarUser1,

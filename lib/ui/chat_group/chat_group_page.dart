@@ -10,12 +10,12 @@ import 'package:workmate/ui/chat_group/chat_group_avatar_header.dart';
 import '../../model/user/user_info_data.dart';
 
 class ChatGroupPage extends StatefulWidget {
-  final String groupId;
-  final String groupName;
+  final String conversationId;
+  final String conversationName;
   final String userName;
   final String avatar;
   final String email;
-  final bool isPrivateGroup;
+  final bool isPrivateConversation;
   final String username1;
   final String username2;
   final bool isAdmin;
@@ -27,11 +27,11 @@ class ChatGroupPage extends StatefulWidget {
   const ChatGroupPage({
     Key? key,
     required this.userName,
-    required this.groupId,
-    required this.groupName,
+    required this.conversationId,
+    required this.conversationName,
     required this.avatar,
     required this.email,
-    required this.isPrivateGroup,
+    required this.isPrivateConversation,
     required this.username1,
     required this.username2,
     required this.isAdmin,
@@ -47,7 +47,7 @@ class ChatGroupPage extends StatefulWidget {
 
 class _ChatGroupPageState extends State<ChatGroupPage> {
   Stream<QuerySnapshot>? chats;
-  TextEditingController messaagesController = TextEditingController();
+  TextEditingController messagesController = TextEditingController();
 
   //String admin = "";
   final ScrollController _scrollController = ScrollController();
@@ -63,14 +63,14 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
   }
 
   getChatandAdmin() async {
-    var chatResult = await FireStoreRepository().getChats(widget.groupId);
+    var chatResult = await FireStoreRepository().getChats(widget.conversationId);
     if (chatResult != null) {
       setState(() {
         chats = chatResult;
       });
     }
 
-    // var adminResult = await FireStoreRepository().getGroupAdmin(widget.groupId);
+    // var adminResult = await FireStoreRepository().getGroupAdmin(widget.conversationId);
     // if (adminResult != null) {
     //   setState(() {
     //     admin = adminResult;
@@ -133,7 +133,7 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
                   children: [
                     Expanded(
                         child: TextFormField(
-                      controller: messaagesController,
+                      controller: messagesController,
                       decoration: const InputDecoration(
                         labelText: "Nhập tin nhắn",
                         labelStyle: TextStyle(color: AppColor.orangePeel),
@@ -195,11 +195,11 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
       appbar = AppBar(
         centerTitle: true,
         elevation: 0,
-        title: widget.isPrivateGroup
+        title: widget.isPrivateConversation
             ? Row(
                 children: [
                   Visibility(
-                    visible: widget.isPrivateGroup,
+                    visible: widget.isPrivateConversation,
                     child: ChatGroupAvatarHeader(
                       imageBase64: displayAvatar,
                       status: getStatusUser(emailDisplay),
@@ -234,9 +234,9 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
         backgroundColor: AppColor.orangePeel,
         actions: [
           Visibility(
-              visible: !widget.isPrivateGroup,
+              visible: !widget.isPrivateConversation,
               child: _buildButtonExitGroup(
-                  context, widget.groupId, widget.groupName, widget.userName))
+                  context, widget.conversationId, widget.conversationName, widget.userName))
         ],
       );
     }
@@ -244,26 +244,26 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
   }
 
   _buildButtonExitGroup(
-      BuildContext context, String groupId, String groupName, String userName) {
+      BuildContext context, String conversationId, String conversationName, String userName) {
     return IconButton(
         onPressed: () {
-          _processExitGroupChat(context, groupId, groupName, userName);
+          _processExitGroupChat(context, conversationId, conversationName, userName);
         },
         icon: const Icon(Icons.exit_to_app));
   }
 
-  _processExitGroupChat(BuildContext context, String groupId, String groupName,
+  _processExitGroupChat(BuildContext context, String conversationId, String conversationName,
       String userName) async {
     if (!widget.isAdmin) {
       await FireStoreRepository()
-          .exitGroupWithRoleMember(groupId, groupName, userName);
+          .exitGroupWithRoleMember(conversationId, conversationName, userName);
       Navigator.of(context).pop();
     }
   }
 
   _getTitle() {
-    if (!widget.isPrivateGroup) {
-      return widget.groupName;
+    if (!widget.isPrivateConversation) {
+      return widget.conversationName;
     } else {
       return widget.userName == widget.username1
           ? widget.username2
@@ -297,7 +297,7 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
               isSameSenderBefore: isSameSenderBefore,
               email: data[index]['email'],
               status: getStatusUser(data[index]['email']),
-              isPrivateChat: widget.isPrivateGroup,
+              isPrivateChat: widget.isPrivateConversation,
               timeSendMessage: data[index]['time'],
             );
           },
@@ -320,17 +320,17 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
   }
 
   sendMessage() {
-    if (messaagesController.text.isNotEmpty) {
+    if (messagesController.text.isNotEmpty) {
       Map<String, dynamic> chatMessageMap = {
-        "message": messaagesController.text,
+        "message": messagesController.text,
         "sender": widget.userName,
         "time": DateTime.now().millisecondsSinceEpoch,
         "avatar": widget.avatar,
         "email": widget.email,
       };
-      FireStoreRepository().sendMessage(widget.groupId, chatMessageMap);
+      FireStoreRepository().sendMessage(widget.conversationId, chatMessageMap);
       setState(() {
-        messaagesController.clear();
+        messagesController.clear();
       });
     }
   }
@@ -342,7 +342,7 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
       }
 
       // update status read
-      FireStoreRepository().updateStatusMessageToRead(widget.groupId);
+      FireStoreRepository().updateStatusMessageToRead(widget.conversationId);
     });
   }
 }

@@ -12,9 +12,10 @@ class UserInfoData {
   final String status;
   final String? fcmToken;
   final bool isAdmin;
+  final Timestamp createdDate;
 
   UserInfoData(this.fullName, this.email, this.profilePic, this.uid,
-      this.status, this.fcmToken, this.isAdmin);
+      this.status, this.fcmToken, this.isAdmin, this.createdDate);
 
   factory UserInfoData.fromQuerySnapshot(QuerySnapshot snapshot) {
     return UserInfoData(
@@ -24,7 +25,8 @@ class UserInfoData {
       snapshot.docs[0]['uid'],
       snapshot.docs[0]['status'],
       snapshot.docs[0]['fcmToken'],
-      snapshot.docs[0]['isAdmin']
+      snapshot.docs[0]['isAdmin'],
+      snapshot.docs[0]['createdDate'] as Timestamp
     );
   }
 

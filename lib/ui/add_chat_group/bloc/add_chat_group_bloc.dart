@@ -31,7 +31,7 @@ class AddChatGroupBloc extends Bloc<AddChatGroupEvent, AddChatGroupState> {
       onNoInternet: (e) {},
       onCallApi: () async {
         emit(state.copyWith(status: BlocStatus.loading));
-        var result = await fireStoreRepository.getAllUser();
+        var result = await fireStoreRepository.getAllExceptMe();
         final currentUser = FirebaseAuth.instance.currentUser?.uid;
         if (currentUser != null) {
           result =
@@ -87,16 +87,16 @@ class AddChatGroupBloc extends Bloc<AddChatGroupEvent, AddChatGroupState> {
           listUserName.add(adminUser.fullName);
 
           final groupId = await FireStoreRepository(uid: adminUser.uid)
-              .createGroup(adminUser.fullName, adminUser.uid, state.groupName,
+              .createConversation(adminUser.fullName, adminUser.uid, state.conversationName,
                   listUuidUser, listUserName);
           emit(state.copyWith(
               statusCreateGroup: BlocStatus.success,
-              groupId: groupId,
+              conversationId: groupId,
               emailAdmin: email,
               isAdmin: true,
               avatarAdmin: adminUser.profilePic,
               usernameAdmin: adminUser.fullName,
-              isPrivateGroup: false));
+              isPrivateConversation: false));
         },
         onError: (e) {
           emit(state.copyWith(statusCreateGroup: BlocStatus.error));
@@ -134,10 +134,10 @@ class AddChatGroupBloc extends Bloc<AddChatGroupEvent, AddChatGroupState> {
         listUserName.add(otherUser.fullName);
 
         final groupId = await FireStoreRepository(uid: adminUser.uid)
-            .createPrivateGroup(
+            .createPrivateConversation(
                 adminUser.fullName,
                 adminUser.uid,
-                state.groupName,
+                state.conversationName,
                 listUuidUser,
                 listUserName,
                 adminUser.profilePic,
@@ -146,12 +146,12 @@ class AddChatGroupBloc extends Bloc<AddChatGroupEvent, AddChatGroupState> {
                 otherUser.email);
         emit(state.copyWith(
             statusCreatePrivateGroup: BlocStatus.success,
-            groupId: groupId,
+            conversationId: groupId,
             emailAdmin: email,
             avatarAdmin: adminUser.profilePic,
             usernameAdmin: adminUser.fullName,
             status: BlocStatus.success,
-            isPrivateGroup: true,
+            isPrivateConversation: true,
             isAdmin: true,
             username1: adminUser.fullName,
             username2: otherUser.fullName,
@@ -171,7 +171,7 @@ class AddChatGroupBloc extends Bloc<AddChatGroupEvent, AddChatGroupState> {
   bool _isValidateSuccessInput(Emitter<AddChatGroupState> emit) {
     // username
     bool showErrorInputGroupName = false;
-    if (state.groupName.isEmpty) {
+    if (state.conversationName.isEmpty) {
       showErrorInputGroupName = true;
     }
 
@@ -197,6 +197,6 @@ class AddChatGroupBloc extends Bloc<AddChatGroupEvent, AddChatGroupState> {
     GroupNameChanged event,
     Emitter<AddChatGroupState> emit,
   ) {
-    emit(state.copyWith(groupName: event.nameGroup));
+    emit(state.copyWith(conversationName: event.nameGroup));
   }
 }
