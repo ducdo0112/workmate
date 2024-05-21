@@ -36,7 +36,7 @@ class FireStoreRepository {
       "uid": uid,
       "status": "Hoạt động",
       "isAdmin": false,
-      "createdDate": Timestamp.now()
+      "createdDate": DateTime.now()
     });
   }
 

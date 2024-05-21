@@ -70,13 +70,6 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
       });
     }
 
-    // var adminResult = await FireStoreRepository().getGroupAdmin(widget.conversationId);
-    // if (adminResult != null) {
-    //   setState(() {
-    //     admin = adminResult;
-    //   });
-    // }
-
     FireStoreRepository().getUserStream().snapshots().listen((event) async {
       final listUserChange = await FireStoreRepository().getAllUser();
       if (isDifferentUserList(listUserInfoData ?? [], listUserChange)) {

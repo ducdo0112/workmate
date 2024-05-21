@@ -9,7 +9,9 @@ import 'package:workmate/ui/chat/bloc/chat_bloc.dart';
 import 'package:workmate/ui/events/bloc/add_event_bloc.dart';
 import 'package:workmate/ui/home/bloc/home_bloc.dart';
 import 'package:workmate/ui/login/bloc/login_bloc.dart';
+import 'package:workmate/ui/people/bloc/people_bloc.dart';
 import 'package:workmate/ui/register/bloc/register_bloc.dart';
+import 'package:workmate/ui/statistic/bloc/statistic_bloc.dart';
 import 'package:workmate/utils/connectivity_helper.dart';
 import 'package:workmate/utils/const.dart';
 
@@ -21,6 +23,8 @@ Future<void> setupDependency({String baseUrl = Const.baseUrlStg}) async {
       () => AuthRepositoryImpl(networkRepository: getIt()));
   getIt.registerLazySingleton<FireStoreRepository>(() => FireStoreRepository());
   getIt.registerFactory<LoginBloc>(() => LoginBloc(authRepository: getIt(), fireStoreRepository: getIt(), ));
+  getIt.registerFactory<PeopleBloc>(() => PeopleBloc(fireStoreRepository: getIt()));
+  getIt.registerFactory<StatisticBloc>(() => StatisticBloc(fireStoreRepository: getIt()));
   getIt.registerFactory<RegisterBloc>(
       () => RegisterBloc(authRepository: getIt()));
   getIt.registerFactory<HomeBloc>(() => HomeBloc(authRepository: getIt()));

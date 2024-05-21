@@ -10,6 +10,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../account_info/page/account_info_page.dart';
+import '../../calendar/page/calendar_page.dart';
+import '../../people/page/people_page.dart';
+import '../../statistic/page/statistic_page.dart';
 
 
 var notificationStreamController = PublishSubject();
@@ -17,9 +20,14 @@ var notificationStreamController = PublishSubject();
 class AdminHomePage extends StatefulWidget {
 
   static final List<Widget> page = <Widget>[
+    const CalendarPage(),
     const ChatListPage(),
+    const PeoplePage(),
+    const StatisticPage(),
     const AccountInfoPage(),
   ];
+
+  const AdminHomePage({Key? key}) : super(key: key);
 
   @override
   State<AdminHomePage> createState() => _AdminHomePageState();
@@ -32,8 +40,20 @@ class _AdminHomePageState extends State<AdminHomePage> {
 
   List<TabItem> items = [
     const TabItem(
+      icon: Icons.calendar_month,
+      title: 'Sự kiện',
+    ),
+    const TabItem(
       icon: Icons.chat,
       title: 'Trò chuyện',
+    ),
+    const TabItem(
+      icon: Icons.people,
+      title: 'Mọi người',
+    ),
+    const TabItem(
+      icon: Icons.people,
+      title: 'Thống kê',
     ),
     const TabItem(
       icon: Icons.person,
@@ -41,13 +61,10 @@ class _AdminHomePageState extends State<AdminHomePage> {
     ),
   ];
 
-
-
   @override
   void initState() {
     super.initState();
     notificationStreamController.listen((value) async {
-
     });
   }
 

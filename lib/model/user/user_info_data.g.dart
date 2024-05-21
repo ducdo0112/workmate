@@ -14,7 +14,7 @@ UserInfoData _$UserInfoDataFromJson(Map<String, dynamic> json) => UserInfoData(
     json['status'] as String,
     json['fcmToken'] as String?,
     json['isAdmin'] as bool,
-    json['createdDate'] as Timestamp);
+    (json['createdDate'] as Timestamp).toDate());
 
 Map<String, dynamic> _$UserInfoDataToJson(UserInfoData instance) =>
     <String, dynamic>{

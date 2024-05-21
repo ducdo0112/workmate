@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../account_info/page/account_info_page.dart';
+import '../../people/page/people_page.dart';
 
 
 var notificationStreamController = PublishSubject();
@@ -21,8 +22,11 @@ class HomePage extends StatefulWidget {
   static final List<Widget> page = <Widget>[
     const CalendarPage(),
     const ChatListPage(),
+    const PeoplePage(),
     const AccountInfoPage(),
   ];
+
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -43,6 +47,10 @@ class _HomePageState extends State<HomePage> {
       title: 'Trò chuyện',
     ),
     const TabItem(
+      icon: Icons.people,
+      title: 'Mọi người',
+    ),
+    const TabItem(
       icon: Icons.person,
       title: 'Cá nhân',
     ),
@@ -54,7 +62,6 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     notificationStreamController.listen((value) async {
-
     });
   }
 

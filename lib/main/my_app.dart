@@ -2,6 +2,7 @@ import 'package:workmate/common/theme/app_themes.dart';
 import 'package:workmate/generated/l10n.dart';
 import 'package:workmate/main/main_dev.dart';
 import 'package:workmate/routing/app_routing.dart';
+import 'package:workmate/ui/admin_home/page/admin_home_page.dart';
 import 'package:workmate/ui/home/page/home_page.dart';
 import 'package:workmate/ui/login/page/login_page.dart';
 import 'package:workmate/utils/const.dart';
@@ -46,7 +47,7 @@ class _MyAppState extends State<MyApp> {
             ],
             supportedLocales: S.delegate.supportedLocales,
             onGenerateRoute: AppRouting.generateRoute,
-            home: widget.hasLogin ? HomePage() : const LoginPage());
+            home: widget.hasLogin ? AdminHomePage() : const LoginPage());
       },
     );
   }

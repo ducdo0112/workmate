@@ -82,7 +82,7 @@ class AccountInfoBloc extends Bloc<AccountInfoEvent, AccountInfoState> {
       currentUserAfterModify?.status ?? '',
       currentUserAfterModify?.fcmToken ?? '',
       currentUserAfterModify?.isAdmin ?? false,
-      currentUserAfterModify?.createdDate?? Timestamp.now(),
+      currentUserAfterModify?.createdDate?? DateTime.now(),
     );
     emit(state.copyWith(userAfterModify: userAfterModify));
   }
@@ -139,7 +139,7 @@ class AccountInfoBloc extends Bloc<AccountInfoEvent, AccountInfoState> {
       currentUserAfterModify?.status ?? '',
       currentUserAfterModify?.fcmToken ?? '',
       currentUserAfterModify?.isAdmin ?? false,
-      currentUserAfterModify?.createdDate?? Timestamp.now(),
+      currentUserAfterModify?.createdDate?? DateTime.now(),
     );
     emit(state.copyWith(userAfterModify: userAfterModify));
   }
@@ -172,7 +172,7 @@ class AccountInfoBloc extends Bloc<AccountInfoEvent, AccountInfoState> {
       event.status ?? "Hoạt động",
       currentUserAfterModify?.fcmToken ?? '',
       currentUserAfterModify?.isAdmin ?? false,
-      currentUserAfterModify?.createdDate ?? Timestamp.now(),
+      currentUserAfterModify?.createdDate ?? DateTime.now(),
     );
     emit(state.copyWith(
         userStatus: event.status, userAfterModify: userAfterModify));
