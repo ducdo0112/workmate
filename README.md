@@ -1,5 +1,4 @@
-# CouponApp (client)
-Develop coupon app (Android and IOS) for CMN
+# WorkMate
 
 ## Information
 
@@ -68,6 +67,4 @@ Run with Visual Studio, add config:
 }
 ]
 }
-
-Run IOS app: open IOS module with Xcode => select scheme "dev" or "prod" to run app
 
