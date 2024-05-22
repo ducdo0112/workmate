@@ -16,44 +16,44 @@ class StatisticBloc extends Bloc<StatisticEvent, StatisticState> {
   final FireStoreRepository fireStoreRepository;
 
   StatisticBloc({required this.fireStoreRepository})
-      : super(StatisticState()) {
+      : super(const StatisticState()) {
     on<SelectStatisticTypeEvent>(_onSelectStatisticType);
   }
 
   Future<void> _onSelectStatisticType(
       SelectStatisticTypeEvent event, Emitter<StatisticState> emit) async {
     emit(state.copyWith(status: BlocStatus.loading));
-      // SUM OF USERS
-      final allUser = await fireStoreRepository.getAllUser();
-      final activeUsers =
-          allUser.where((user) => user.status == "Hoạt động").length;
-      final totalUsers = allUser.length;
+    // SUM OF USERS
+    final allUser = await fireStoreRepository.getUsersStream();
 
-    final currentMonth = DateTime.now().month;
-
-    // Prepare data for StatisticPoint list
-    final List<StatisticPoint> data = [];
-
-    // Iterate from current month to January
-    for (int monthIndex = 1; monthIndex <= currentMonth; monthIndex++) {
-      // Filter users with createDate in the current month
-      final usersInMonth = allUser.where((user) => user.createdDate.month == monthIndex).toList();
-      final totalUsersInMonth = usersInMonth.length;
-
-      // Add data point to the list
-      data.add(StatisticPoint(getMonthName(monthIndex), totalUsersInMonth));
-    }
-
-    data.forEach((element) {
-      print("${element.month} - ${element.value}");
-    });
-
-      emit(state.copyWith(
+    emit(state.copyWith(
         status: BlocStatus.success,
         selectedType: event.type,
-        activeUsers: activeUsers,
-        totalUsers: totalUsers,
-        dataUserCreate: data
-      ));
+        usersStream: allUser));
   }
 }
+
+// final activeUsers =
+//     allUser.where((user) => user.status == "Hoạt động").length;
+// final totalUsers = allUser.length;
+//
+// final currentMonth = DateTime.now().month;
+//
+// // Prepare data for StatisticPoint list
+// final List<StatisticPoint> data = [];
+//
+// // Iterate from current month to January
+// for (int monthIndex = 1; monthIndex <= currentMonth; monthIndex++) {
+// // Filter users with createDate in the current month
+// final usersInMonth = allUser
+//     .where((user) => user.createdDate.month == monthIndex)
+//     .toList();
+// final totalUsersInMonth = usersInMonth.length;
+//
+// // Add data point to the list
+// data.add(StatisticPoint(getMonthName(monthIndex), totalUsersInMonth));
+// }
+//
+// data.forEach((element) {
+// print("${element.month} - ${element.value}");
+// });

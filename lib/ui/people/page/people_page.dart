@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image/image.dart';
+import 'package:workmate/common/bloc/bloc_consumer_creation.dart';
 import 'package:workmate/model/user/user_info_data.dart';
 import 'package:workmate/ui/people/bloc/people_bloc.dart';
 import 'package:workmate/ui/people/bloc/people_event.dart';
@@ -9,6 +10,7 @@ import 'package:workmate/ui/people/bloc/people_state.dart';
 import '../../../common/color/app_color.dart';
 import '../../../main/main_dev.dart';
 import '../../../repository/firestore_repository.dart';
+import '../../../repository/shared_preferences_repository.dart';
 import '../../add_chat_group/widget/profile_widget_chat.dart';
 
 class PeoplePage extends StatefulWidget {
@@ -20,22 +22,13 @@ class PeoplePage extends StatefulWidget {
 
 class _PeoplePageState extends State<PeoplePage> {
   final TextEditingController _searchController = TextEditingController();
-  late List<UserInfoData> _filteredUsers = [];
+  List<dynamic> _users = [];
+  List<dynamic> _filteredUsers = [];
 
   @override
   void initState() {
     super.initState();
     _searchController.addListener(_onSearchChanged);
-    // FireStoreRepository().getUserStream().snapshots().listen((event) async {
-    //   print("onChange");
-    //   final listUserChange = await FireStoreRepository().getAllExceptMe();
-    //   listUserChange.forEach((element) {
-    //     print(element.fullName);
-    //   });
-    //   setState(() {
-    //     _filteredUsers = listUserChange;
-    //   });
-    // });
   }
 
   @override
@@ -47,40 +40,66 @@ class _PeoplePageState extends State<PeoplePage> {
 
   void _onSearchChanged() {
     final query = _searchController.text.toLowerCase();
-    setState(() {
-      _filteredUsers = getIt<PeopleBloc>().state.users.where((user) {
-        return user.fullName.toLowerCase().contains(query);
-      }).toList();
-    });
+    final userID = SharedPreferencesHelper.getStringType(
+        SharedPreferencesHelper.keyUUID);
+    if (query.isEmpty) {
+      // No search query, show all users
+      setState(() {
+        _filteredUsers = _users.where((user) =>
+        user.uid != userID && !user.isAdmin).toList();
+      });
+    } else {
+      // Apply search filter
+      setState(() {
+        _filteredUsers = _users.where((user) =>
+        user.fullName.toLowerCase().contains(query) &&
+            user.uid != userID && !user.isAdmin).toList();
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: BlocProvider(
-        create: (context) => getIt<PeopleBloc>()..add(const PeopleEventInitFetched()),
-        child: BlocBuilder<PeopleBloc, PeopleState>(
-          builder: (context, state) {
-            if (_searchController.text.isEmpty) {
-              _filteredUsers = context.read<PeopleBloc>().state.users;
-            }
-            else {
-              final query = _searchController.text.toLowerCase();
-              _filteredUsers = context.read<PeopleBloc>().state.users.where((user) {
-                return user.fullName.toLowerCase().contains(query);
-              }).toList();
-            }
-            return Scaffold(
-              body: Column(
-                children: [
-                  _buildSearchField(context),
-                  Expanded(child: _buildPeopleList(state)),
-                ],
-              ),
-            );
-          },
-        ),
-      ),
+          create: (context) =>
+              getIt<PeopleBloc>()..add(const PeopleEventInitFetched()),
+          child: createBlocConsumer<PeopleEvent, PeopleState, PeopleBloc>(
+              buildWhen: (previous, current) =>
+                  previous.usersStream != current.usersStream,
+              shouldShowLoadingFullScreen: true,
+              builder: (context, state) {
+                return StreamBuilder(
+                    stream: state.usersStream,
+                    builder: (context, AsyncSnapshot snapshot) {
+                      // make some check
+                      if (snapshot.hasData) {
+                        final userDocs = snapshot.data.docs;
+                        final userID = SharedPreferencesHelper.getStringType(
+                            SharedPreferencesHelper.keyUUID);
+                        final List<dynamic> allUsers = userDocs
+                            .map((doc) => UserInfoData.fromJson(
+                                (doc.data() as Map<String, dynamic>)))
+                            .toList();
+
+                        final users = allUsers.where((element) => element.uid != userID && element.isAdmin == false).toList();
+                        if (_users.isEmpty) {
+                          _users.addAll(users);
+                          _filteredUsers.addAll(users);
+                        }
+                        return Scaffold(
+                          body: Column(
+                            children: [
+                              _buildSearchField(context),
+                              Expanded(child: _buildPeopleList(state)),
+                            ],
+                          ),
+                        );
+                      } else {
+                        return const Center(child: Text("Something is wrong"));
+                      }
+                    });
+              })),
     );
   }
 
@@ -113,13 +132,14 @@ class _PeoplePageState extends State<PeoplePage> {
       itemBuilder: (context, index) {
         return ListTile(
           onLongPress: () {
-            if (state.isAdmin) {
+            if (state.isAdmin == true) {
               showDialog(
                 context: context,
                 builder: (context) {
                   return AlertDialog(
                     title: const Text('Xóa người dùng'),
-                    content: const Text('Bạn có chắc chắn muốn xóa người dùng này?'),
+                    content:
+                        const Text('Bạn có chắc chắn muốn xóa người dùng này?'),
                     actions: [
                       TextButton(
                         onPressed: () {
@@ -130,9 +150,11 @@ class _PeoplePageState extends State<PeoplePage> {
                       TextButton(
                         onPressed: () {
                           Navigator.of(context).pop();
-                          getIt<PeopleBloc>().add(PeopleEventDeleteUser(uuid: _filteredUsers[index].uid));
+                          getIt<PeopleBloc>().add(PeopleEventDeleteUser(
+                              uuid: _filteredUsers[index].uid));
                           setState(() {
-                            _filteredUsers.removeWhere((element) => element.uid == _filteredUsers[index].uid);
+                            _filteredUsers.removeWhere((element) =>
+                                element.uid == _filteredUsers[index].uid);
                           });
                         },
                         child: const Text('Xóa'),
@@ -150,8 +172,10 @@ class _PeoplePageState extends State<PeoplePage> {
               imageBase64: _filteredUsers[index].profilePic,
             ),
           ),
-          title: Text(_filteredUsers[index].fullName, style: const TextStyle(fontSize: 16)),
-          trailing: _buildActivityIndicator(_filteredUsers[index].status == "Hoạt động"),
+          title: Text(_filteredUsers[index].fullName,
+              style: const TextStyle(fontSize: 16)),
+          trailing: _buildActivityIndicator(
+              _filteredUsers[index].status == "Hoạt động"),
         );
       },
     );

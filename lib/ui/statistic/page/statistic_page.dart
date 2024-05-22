@@ -7,6 +7,9 @@ import 'package:syncfusion_flutter_charts/sparkcharts.dart';
 import '../../../common/bloc/bloc_consumer_creation.dart';
 import '../../../main/main_dev.dart';
 import '../../../model/statistic/statistic_point.dart';
+import '../../../model/user/user_info_data.dart';
+import '../../../repository/firestore_repository.dart';
+import '../../../utils/hepler_function.dart';
 import '../bloc/statistic_bloc.dart';
 
 class StatisticPage extends StatefulWidget {
@@ -36,63 +39,81 @@ class _StatisticPageState extends State<StatisticPage> {
         home: Scaffold(
             body: SafeArea(
           child: Column(children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              child: DropdownButton<StatisticType>(
-                value: selectedStatisticLabel,
-                hint: const Text('Chọn loại thống kê'),
-                onChanged: (StatisticType? label) {
-                  setState(() {
-                    setState(() {
-                      selectedStatisticLabel = label;
-                      getIt<StatisticBloc>().add(SelectStatisticTypeEvent(label!));
-                    });
-                  });
-                },
-                items: StatisticType.values
-                    .map<DropdownMenuItem<StatisticType>>(
-                        (StatisticType label) {
-                  return DropdownMenuItem<StatisticType>(
-                    value: label,
-                    child: Text(label.label),
-                  );
-                }).toList(),
-              ),
-            ),
-            Expanded(
-                child: BlocProvider(
-                    create: (context) => getIt<StatisticBloc>()
-                      ..add(const SelectStatisticTypeEvent(
-                          StatisticType.sumOfActiveUser)),
-                    child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 16),
-                        child: createBlocConsumer<
-                            StatisticEvent,
-                            StatisticState,
-                            StatisticBloc>(builder: (context, state) {
-                          if (state.totalUsers != 0) {
-                            print("Run 1");
-                            return selectedStatisticLabel!.page(
-                                state.totalUsers,
-                                state.activeUsers,
-                                state.dataUserCreate);
-                          } else if (state.selectedType ==
-                              StatisticType.userCreatedByTime) {
-                            print("Run 2");
-                            return selectedStatisticLabel!.page(
-                                state.totalUsers,
-                                state.activeUsers,
-                                state.dataUserCreate);
-                          } else {
-                            print("Run 3");
-                            return selectedStatisticLabel!.page(
-                                state.totalUsers,
-                                state.activeUsers,
-                                state.dataUserCreate);
-                          }
-                        })))),
+            _buildHeader(),
+            _buildContentContainer(context)
           ]),
         )));
+  }
+
+  Widget _buildHeader() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: DropdownButton<StatisticType>(
+        value: selectedStatisticLabel,
+        hint: const Text('Chọn loại thống kê'),
+        onChanged: (StatisticType? label) {
+          setState(() {
+            setState(() {
+              selectedStatisticLabel = label;
+              getIt<StatisticBloc>().add(SelectStatisticTypeEvent(label!));
+            });
+          });
+        },
+        items: StatisticType.values
+            .map<DropdownMenuItem<StatisticType>>((StatisticType label) {
+          return DropdownMenuItem<StatisticType>(
+            value: label,
+            child: Text(label.label),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildContentContainer(BuildContext context) {
+    return BlocProvider(
+      create: (context) => getIt<StatisticBloc>()
+        ..add(const SelectStatisticTypeEvent(StatisticType.sumOfActiveUser)),
+      child: createBlocConsumer<StatisticEvent, StatisticState, StatisticBloc>(
+          buildWhen: (previous, current) =>
+              previous.usersStream != current.usersStream,
+          shouldShowLoadingFullScreen: true,
+          builder: (context, state) {
+            return StreamBuilder(
+                stream: state.usersStream,
+                builder: (context, AsyncSnapshot snapshot) {
+                  // make some check
+                  if (snapshot.hasData) {
+                    final userDocs = snapshot.data.docs;
+                    final List<dynamic> users = userDocs
+                        .map((doc) => UserInfoData.fromJson(
+                            (doc.data() as Map<String, dynamic>)))
+                        .toList();
+
+                    final activeUserNumber = users
+                        .where((user) => user.status == "Hoạt động")
+                        .toList()
+                        .length;
+
+                    if (state.selectedType == StatisticType.sumOfActiveUser) {
+                      return selectedStatisticLabel!.page(users.length,
+                          activeUserNumber, prepareUserCreatedData(users));
+                    } else if (state.selectedType ==
+                        StatisticType.userCreatedByTime) {
+                      return selectedStatisticLabel!.page(users.length,
+                          activeUserNumber, prepareUserCreatedData(users));
+                    } else {
+                      return selectedStatisticLabel!.page(users.length,
+                          activeUserNumber, prepareUserCreatedData(users));
+                    }
+                  } else {
+                    return Center(
+                      child: Text("Something is wrong"),
+                    );
+                  }
+                });
+          }),
+    );
   }
 }
 
@@ -191,78 +212,60 @@ Widget _buildLegendItem(Color color, String text) {
 }
 
 Widget _buildCreateUserByDayPage(List<StatisticPoint> data) {
-  return Padding(
-    padding: const EdgeInsets.all(16),
-    child: Column(
-      children: [
-        SfCartesianChart(
-            primaryXAxis: const CategoryAxis(),
-            title: const ChartTitle(text: 'Lượng người dùng tạo mới hàng tháng'),
-            legend: const Legend(isVisible: true),
-            tooltipBehavior: TooltipBehavior(enable: true),
-            series: <CartesianSeries<StatisticPoint, String>>[
-              LineSeries<StatisticPoint, String>(
-                  dataSource: data,
-                  xValueMapper: (StatisticPoint sales, _) => sales.month,
-                  yValueMapper: (StatisticPoint sales, _) => sales.value,
-                  name: 'Người dùng',
-                  // Enable data label
-                  dataLabelSettings: const DataLabelSettings(isVisible: true))
-            ]),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            //Initialize the spark charts widget
-            child: SfSparkLineChart.custom(
-              //Enable the trackball
-              trackball: const SparkChartTrackball(
-                  activationMode: SparkChartActivationMode.tap),
-              //Enable marker
-              marker: const SparkChartMarker(
-                  displayMode: SparkChartMarkerDisplayMode.all),
-              //Enable data label
-              labelDisplayMode: SparkChartLabelDisplayMode.all,
-              xValueMapper: (int index) => data[index].month,
-              yValueMapper: (int index) => data[index].value,
-              dataCount: 5, // Change this number to show number of data
+  return Expanded(
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SfCartesianChart(
+              primaryXAxis: const CategoryAxis(),
+              title:
+                  const ChartTitle(text: 'Lượng người dùng tạo mới hàng tháng'),
+              legend: const Legend(isVisible: true),
+              tooltipBehavior: TooltipBehavior(enable: true),
+              series: <CartesianSeries<StatisticPoint, String>>[
+                LineSeries<StatisticPoint, String>(
+                    dataSource: data,
+                    xValueMapper: (StatisticPoint sales, _) => sales.month,
+                    yValueMapper: (StatisticPoint sales, _) => sales.value,
+                    name: 'Người dùng',
+                    // Enable data label
+                    dataLabelSettings: const DataLabelSettings(isVisible: true))
+              ]),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              //Initialize the spark charts widget
+              child: SfSparkLineChart.custom(
+                //Enable the trackball
+                trackball: const SparkChartTrackball(
+                    activationMode: SparkChartActivationMode.tap),
+                //Enable marker
+                marker: const SparkChartMarker(
+                    displayMode: SparkChartMarkerDisplayMode.all),
+                //Enable data label
+                labelDisplayMode: SparkChartLabelDisplayMode.all,
+                xValueMapper: (int index) => data[index].month,
+                yValueMapper: (int index) => data[index].value,
+                dataCount: 5, // Change this number to show number of data
+              ),
             ),
-          ),
-        )
-      ],
+          )
+        ],
+      ),
     ),
   );
 }
 
-List<StatisticPoint> data = [
-  StatisticPoint("20", 60),
-  StatisticPoint("10", 70),
-  StatisticPoint("30", 80),
-  StatisticPoint("10", 90),
-  StatisticPoint("50", 100),
-];
-
-Widget _buildSumOfGroupChat() {
+Widget _buildSumOf() {
   // Replace with actual data and UI
-  return Padding(
-    padding: const EdgeInsets.all(16),
-    child: Column(
-      children: [
-        SfCartesianChart(
-            primaryXAxis: const CategoryAxis(),
-            title: const ChartTitle(text: 'Lượng người dùng tạo mới hàng tháng'),
-            legend: const Legend(isVisible: true),
-            tooltipBehavior: TooltipBehavior(enable: true),
-            series: <CartesianSeries<StatisticPoint, String>>[
-              LineSeries<StatisticPoint, String>(
-                  dataSource: data,
-                  xValueMapper: (StatisticPoint sales, _) => sales.month,
-                  yValueMapper: (StatisticPoint sales, _) => sales.value,
-                  name: 'Người dùng',
-                  // Enable data label
-                  dataLabelSettings: const DataLabelSettings(isVisible: true))
-            ]),
-      ],
-    ),
+  return const Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: <Widget>[
+      Text("Tổng số người dùng: 1000", style: TextStyle(fontSize: 20)),
+    ],
   );
 }
 
@@ -286,7 +289,21 @@ extension StatisticTypeExtension on StatisticType {
       case StatisticType.userCreatedByTime:
         return _buildCreateUserByDayPage(dataUserCreate ?? []);
       case StatisticType.sumOfGroupChat:
-        return _buildSumOfGroupChat();
+        return _buildSumOf();
     }
   }
+}
+
+List<StatisticPoint> prepareUserCreatedData(List<dynamic> users) {
+  final currentMonth = DateTime.now().month;
+  final List<StatisticPoint> data = [];
+
+  for (int monthIndex = 1; monthIndex <= currentMonth; monthIndex++) {
+    final usersInMonth =
+        users.where((user) => user.createdDate.month == monthIndex).toList();
+    final totalUsersInMonth = usersInMonth.length;
+    data.add(StatisticPoint(getMonthName(monthIndex), totalUsersInMonth));
+  }
+
+  return data;
 }

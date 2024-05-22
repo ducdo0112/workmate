@@ -4,38 +4,30 @@ enum StatisticType { sumOfActiveUser, userCreatedByTime, sumOfGroupChat }
 
 class StatisticState extends BaseState {
   final StatisticType? selectedType;
-  final int? activeUsers;
-  final int? totalUsers;
-  List<StatisticPoint>? dataUserCreate;
+  final Stream? usersStream;
 
-  StatisticState({
+  const StatisticState({
     BlocStatus status = BlocStatus.initial,
     NetworkException? exception,
     this.selectedType,
-    this.activeUsers,
-    this.totalUsers,
-    this.dataUserCreate,
+    this.usersStream,
   }) : super(status: status, exception: exception);
 
   StatisticState copyWith({
     BlocStatus? status,
     NetworkException? exception,
     StatisticType? selectedType,
-    int? activeUsers,
-    int? totalUsers,
-    List<StatisticPoint>? dataUserCreate
+    final Stream? usersStream
   }) {
     return StatisticState(
       status: status ?? this.status,
       exception: exception ?? this.exception,
       selectedType: selectedType ?? this.selectedType,
-      activeUsers: activeUsers ?? this.activeUsers,
-      totalUsers: totalUsers ?? this.totalUsers,
-      dataUserCreate: dataUserCreate?? this.dataUserCreate,
+      usersStream: usersStream ?? this.usersStream
     );
   }
 
   @override
   List<Object?> get props =>
-      super.props..addAll([selectedType, activeUsers, totalUsers, dataUserCreate]);
+      super.props..addAll([selectedType, usersStream]);
 }
