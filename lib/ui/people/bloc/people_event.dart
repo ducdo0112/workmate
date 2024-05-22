@@ -12,11 +12,11 @@ class PeopleEventInitFetched extends PeopleEvent {
   List<Object> get props => [];
 }
 
-class PeopleEventSearch extends PeopleEvent {
-  final String query;
+class PeopleEventDeleteUser extends PeopleEvent {
+  final String uuid;
 
-  const PeopleEventSearch({required this.query});
+  const PeopleEventDeleteUser({required this.uuid});
 
   @override
-  List<Object?> get props => [query];
+  List<Object?> get props => [uuid];
 }

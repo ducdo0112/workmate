@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image/image.dart';
 import 'package:workmate/model/user/user_info_data.dart';
 import 'package:workmate/ui/people/bloc/people_bloc.dart';
 import 'package:workmate/ui/people/bloc/people_event.dart';
@@ -7,6 +8,7 @@ import 'package:workmate/ui/people/bloc/people_state.dart';
 
 import '../../../common/color/app_color.dart';
 import '../../../main/main_dev.dart';
+import '../../../repository/firestore_repository.dart';
 import '../../add_chat_group/widget/profile_widget_chat.dart';
 
 class PeoplePage extends StatefulWidget {
@@ -18,12 +20,38 @@ class PeoplePage extends StatefulWidget {
 
 class _PeoplePageState extends State<PeoplePage> {
   final TextEditingController _searchController = TextEditingController();
-  late List<UserInfoData> _originalUsers;
+  late List<UserInfoData> _filteredUsers = [];
 
   @override
   void initState() {
     super.initState();
-    _originalUsers = getIt<PeopleBloc>().state.users;
+    _searchController.addListener(_onSearchChanged);
+    // FireStoreRepository().getUserStream().snapshots().listen((event) async {
+    //   print("onChange");
+    //   final listUserChange = await FireStoreRepository().getAllExceptMe();
+    //   listUserChange.forEach((element) {
+    //     print(element.fullName);
+    //   });
+    //   setState(() {
+    //     _filteredUsers = listUserChange;
+    //   });
+    // });
+  }
+
+  @override
+  void dispose() {
+    _searchController.removeListener(_onSearchChanged);
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged() {
+    final query = _searchController.text.toLowerCase();
+    setState(() {
+      _filteredUsers = getIt<PeopleBloc>().state.users.where((user) {
+        return user.fullName.toLowerCase().contains(query);
+      }).toList();
+    });
   }
 
   @override
@@ -33,6 +61,15 @@ class _PeoplePageState extends State<PeoplePage> {
         create: (context) => getIt<PeopleBloc>()..add(const PeopleEventInitFetched()),
         child: BlocBuilder<PeopleBloc, PeopleState>(
           builder: (context, state) {
+            if (_searchController.text.isEmpty) {
+              _filteredUsers = context.read<PeopleBloc>().state.users;
+            }
+            else {
+              final query = _searchController.text.toLowerCase();
+              _filteredUsers = context.read<PeopleBloc>().state.users.where((user) {
+                return user.fullName.toLowerCase().contains(query);
+              }).toList();
+            }
             return Scaffold(
               body: Column(
                 children: [
@@ -62,28 +99,59 @@ class _PeoplePageState extends State<PeoplePage> {
           prefixIcon: Icon(Icons.search, color: Colors.grey),
           border: InputBorder.none,
         ),
-        style: const TextStyle(color: Colors.black), // Màu chữ
         onChanged: (query) {
-          getIt<PeopleBloc>().add(PeopleEventSearch(query: query));
+          _onSearchChanged();
         },
+        style: const TextStyle(color: Colors.black), // Màu chữ
       ),
     );
   }
 
   Widget _buildPeopleList(PeopleState state) {
     return ListView.builder(
-      itemCount: state.users.length,
+      itemCount: _filteredUsers.length,
       itemBuilder: (context, index) {
         return ListTile(
+          onLongPress: () {
+            if (state.isAdmin) {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text('Xóa người dùng'),
+                    content: const Text('Bạn có chắc chắn muốn xóa người dùng này?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('Hủy'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          getIt<PeopleBloc>().add(PeopleEventDeleteUser(uuid: _filteredUsers[index].uid));
+                          setState(() {
+                            _filteredUsers.removeWhere((element) => element.uid == _filteredUsers[index].uid);
+                          });
+                        },
+                        child: const Text('Xóa'),
+                      ),
+                    ],
+                  );
+                },
+              );
+            }
+          },
           leading: SizedBox(
             width: 50,
             height: 50,
             child: ProfileWidgetChat(
-              imageBase64: state.users[index].profilePic,
+              imageBase64: _filteredUsers[index].profilePic,
             ),
           ),
-          title: Text(state.users[index].fullName, style: const TextStyle(fontSize: 16)),
-          trailing: _buildActivityIndicator(state.users[index].status == "Hoạt động"),
+          title: Text(_filteredUsers[index].fullName, style: const TextStyle(fontSize: 16)),
+          trailing: _buildActivityIndicator(_filteredUsers[index].status == "Hoạt động"),
         );
       },
     );

@@ -18,6 +18,7 @@ abstract class AuthRepository {
       {required String username,
       required String email,
       required String password});
+  // Future<void> deleteUser(String uid);
 }
 
 class AuthRepositoryImpl extends AuthRepository {
@@ -54,4 +55,22 @@ class AuthRepositoryImpl extends AuthRepository {
   Future<bool> singOut() async {
     return true;
   }
+
+  // @override
+  // Future<void> deleteUser(String uid) async {
+  //   try {
+  //     User? user = firebaseAuth.currentUser;
+  //     if (user != null && user.uid == uid) {
+  //       await user.delete();
+  //     } else {
+  //       User? userToDelete = await firebaseAuth.getUser(uid);
+  //       if (userToDelete != null) {
+  //         await userToDelete.delete();
+  //       }
+  //     }
+  //   } catch (e) {
+  //     logger.e('Error deleting user: $e');
+  //     rethrow;
+  //   }
+  // }
 }

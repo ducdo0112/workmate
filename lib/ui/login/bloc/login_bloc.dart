@@ -70,6 +70,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           emit(state.copyWith(status: BlocStatus.success, isAdmin: user.isAdmin));
           await SharedPreferencesHelper.setStringType(
               SharedPreferencesHelper.keyEmail, state.email);
+          await SharedPreferencesHelper.setStringType(
+              SharedPreferencesHelper.keyUUID, loginCredential.user!.uid);
           await FirebaseRemoteMessageService()
               .updateFcmTokenOnServerAfterLoginOrRegister(
                   loginCredential.user?.uid ?? '');

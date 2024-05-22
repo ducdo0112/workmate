@@ -88,6 +88,18 @@ class FireStoreRepository {
     return allData;
   }
 
+  Future<void> deleteUser(String uid) async {
+    try {
+      userCollection.doc(uid).delete();
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null && user.uid == uid) {
+        await user.delete();
+      }
+    } catch (e) {
+      print("Error deleting user: $e");
+    }
+  }
+
   // getting all user data
   Future<List<UserInfoData>> getAllExceptMe() async {
     // Get docs from collection reference
@@ -107,6 +119,11 @@ class FireStoreRepository {
 
   CollectionReference<Object?> getUserStream() {
     return userCollection;
+  }
+
+  getUsersStream()
+  {
+    return userCollection.snapshots();
   }
 
   // getting user data

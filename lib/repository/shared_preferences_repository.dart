@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferencesHelper {
+  static const String keyUUID = 'keyUUID';
   static const String keyEmail = 'keyEmail';
   static const String keyStatus = 'keyStatus';
 

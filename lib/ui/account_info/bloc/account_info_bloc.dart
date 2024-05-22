@@ -154,6 +154,8 @@ class AccountInfoBloc extends Bloc<AccountInfoEvent, AccountInfoState> {
         SharedPreferencesHelper.keyEmail, '');
     await SharedPreferencesHelper.setStringType(
         SharedPreferencesHelper.keyStatus, '');
+    await SharedPreferencesHelper.setStringType(
+        SharedPreferencesHelper.keyUUID, '');
     emit(state.copyWith(logoutStatus: BlocStatus.success));
   }
 

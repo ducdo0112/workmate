@@ -233,13 +233,36 @@ Widget _buildCreateUserByDayPage(List<StatisticPoint> data) {
   );
 }
 
-Widget _buildSumOfUserPage() {
+List<StatisticPoint> data = [
+  StatisticPoint("20", 60),
+  StatisticPoint("10", 70),
+  StatisticPoint("30", 80),
+  StatisticPoint("10", 90),
+  StatisticPoint("50", 100),
+];
+
+Widget _buildSumOfGroupChat() {
   // Replace with actual data and UI
-  return const Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: <Widget>[
-      Text("Tổng số người dùng: 1000", style: TextStyle(fontSize: 20)),
-    ],
+  return Padding(
+    padding: const EdgeInsets.all(16),
+    child: Column(
+      children: [
+        SfCartesianChart(
+            primaryXAxis: const CategoryAxis(),
+            title: const ChartTitle(text: 'Lượng người dùng tạo mới hàng tháng'),
+            legend: const Legend(isVisible: true),
+            tooltipBehavior: TooltipBehavior(enable: true),
+            series: <CartesianSeries<StatisticPoint, String>>[
+              LineSeries<StatisticPoint, String>(
+                  dataSource: data,
+                  xValueMapper: (StatisticPoint sales, _) => sales.month,
+                  yValueMapper: (StatisticPoint sales, _) => sales.value,
+                  name: 'Người dùng',
+                  // Enable data label
+                  dataLabelSettings: const DataLabelSettings(isVisible: true))
+            ]),
+      ],
+    ),
   );
 }
 
@@ -263,7 +286,7 @@ extension StatisticTypeExtension on StatisticType {
       case StatisticType.userCreatedByTime:
         return _buildCreateUserByDayPage(dataUserCreate ?? []);
       case StatisticType.sumOfGroupChat:
-        return _buildSumOfUserPage();
+        return _buildSumOfGroupChat();
     }
   }
 }
