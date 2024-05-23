@@ -7,7 +7,6 @@ import 'package:workmate/common/widget/custom_button.dart';
 import 'package:workmate/common/widget/input_form_with_select_file.dart';
 import 'package:workmate/common/widget/input_form_with_time_picker.dart';
 import 'package:workmate/model/enum/bloc_status.dart';
-import 'package:workmate/model/event/event.dart';
 import 'package:workmate/ui/events/bloc/add_event_bloc.dart';
 import 'package:workmate/ui/events/bloc/add_event_event.dart';
 import 'package:workmate/ui/events/bloc/add_event_state.dart';
@@ -614,74 +613,72 @@ class _AddEventPageState extends State<AddEventPage> {
     }
 
     return Container(
-      child: Row(
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Text("Tag:",
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 4),
-                BlocBuilder<AddEventBloc, AddEventState>(
-                  buildWhen: (previous, current) =>
-                      previous.tagEdit != current.tagEdit ||
-                      previous.tag != current.tag,
-                  builder: (context, state) {
-                    String groupValueColor = state.tagEdit;
-                    return Row(
-                      children: [
-                        Radio<String>(
-                          value: 'red',
-                          groupValue: groupValueColor,
-                          fillColor:
-                              MaterialStateProperty.resolveWith(getColorRed),
-                          onChanged: (String? value) {
-                            context
-                                .read<AddEventBloc>()
-                                .add(AddEventTagChanged(value ?? 'red'));
-                          },
-                        ),
-                        Radio<String>(
-                          value: 'green',
-                          groupValue: groupValueColor,
-                          fillColor:
-                              MaterialStateProperty.resolveWith(getColorGreen),
-                          onChanged: (String? value) {
-                            context
-                                .read<AddEventBloc>()
-                                .add(AddEventTagChanged(value ?? 'green'));
-                          },
-                        ),
-                        Radio<String>(
-                          value: 'blue',
-                          groupValue: groupValueColor,
-                          fillColor:
-                              MaterialStateProperty.resolveWith(getColorBlue),
-                          onChanged: (String? value) {
-                            context
-                                .read<AddEventBloc>()
-                                .add(AddEventTagChanged(value ?? 'blue'));
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                )
-              ],
-            ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text("Tag:",
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 4),
+              BlocBuilder<AddEventBloc, AddEventState>(
+                buildWhen: (previous, current) =>
+                    previous.tagEdit != current.tagEdit ||
+                    previous.tag != current.tag,
+                builder: (context, state) {
+                  String groupValueColor = state.tagEdit;
+                  return Row(
+                    children: [
+                      Radio<String>(
+                        value: 'red',
+                        groupValue: groupValueColor,
+                        fillColor:
+                            MaterialStateProperty.resolveWith(getColorRed),
+                        onChanged: (String? value) {
+                          context
+                              .read<AddEventBloc>()
+                              .add(AddEventTagChanged(value ?? 'red'));
+                        },
+                      ),
+                      Radio<String>(
+                        value: 'green',
+                        groupValue: groupValueColor,
+                        fillColor:
+                            MaterialStateProperty.resolveWith(getColorGreen),
+                        onChanged: (String? value) {
+                          context
+                              .read<AddEventBloc>()
+                              .add(AddEventTagChanged(value ?? 'green'));
+                        },
+                      ),
+                      Radio<String>(
+                        value: 'blue',
+                        groupValue: groupValueColor,
+                        fillColor:
+                            MaterialStateProperty.resolveWith(getColorBlue),
+                        onChanged: (String? value) {
+                          context
+                              .read<AddEventBloc>()
+                              .add(AddEventTagChanged(value ?? 'blue'));
+                        },
+                      ),
+                    ],
+                  );
+                },
+              )
+            ],
           ),
           const SizedBox(
             width: 16,
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              BlocBuilder<AddEventBloc, AddEventState>(
-                buildWhen: (previous, current) => true,
-                builder: (context, state) {
-                  return CustomButton(
+          BlocBuilder<AddEventBloc, AddEventState>(
+            buildWhen: (previous, current) => true,
+            builder: (context, state) {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CustomButton(
                     widthButton: 150,
                     title: state.isCreateNewEvent ? "Thêm mới" : "Cập nhật",
                     buttonStatus: state.statusRegisterOrUpdate,
@@ -695,13 +692,55 @@ class _AddEventPageState extends State<AddEventPage> {
                     backgroundColorEnable: AppColor.orangePeel,
                     isEnable:
                         state.isCreateNewEvent || state.isEnableUpdateButton(),
-                  );
-                },
-              )
-            ],
+                  ),
+                   SizedBox(width: 12,),
+                   !state.isCreateNewEvent ? CustomButton(
+                    widthButton: 150,
+                    title: "Xoá",
+                    buttonStatus: state.statusRegisterOrUpdate,
+                    buttonClick: () {
+                      context.read<AddEventBloc>().add(DeleteEvent());
+                    },
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w600,
+                    textColorEnable: AppColor.white,
+                    circularProgressColor: AppColor.white,
+                    backgroundColorEnable: AppColor.orangePeel,
+                    isEnable:
+                    state.isMainEvent
+                  ) : const SizedBox(height: 20,)
+                ],
+              );
+            },
           ),
         ],
       ),
+    );
+  }
+  void _showDeleteConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Xóa Task'),
+          content: Text('Bạn có chắc chắn muốn xóa task này không?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Hủy'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Xóa', style: TextStyle(color: Colors.red)),
+              onPressed: () {
+                Navigator.of(context).pop();
+
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

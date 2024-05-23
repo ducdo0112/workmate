@@ -8,7 +8,6 @@ import '../../../common/bloc/bloc_consumer_creation.dart';
 import '../../../main/main_dev.dart';
 import '../../../model/statistic/statistic_point.dart';
 import '../../../model/user/user_info_data.dart';
-import '../../../repository/firestore_repository.dart';
 import '../../../utils/hepler_function.dart';
 import '../bloc/statistic_bloc.dart';
 
@@ -118,26 +117,29 @@ class _StatisticPageState extends State<StatisticPage> {
 }
 
 Widget _buildSumOfActiveUserPage(int? usersNumber, int? activeUser) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.center,
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-      Container(
-        height: 240, // Giảm kích thước của PieChart
-        width: 240,
-        child: PieChart(
-          PieChartData(
-            borderData: FlBorderData(show: true),
-            sectionsSpace: 4,
-            sections: _buildPieChartSections(usersNumber ?? 0, activeUser ?? 0),
+  return Container(
+    margin: EdgeInsets.symmetric(horizontal: 12),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SizedBox(
+          height: 240, // Giảm kích thước của PieChart
+          width: 240,
+          child: PieChart(
+            PieChartData(
+              borderData: FlBorderData(show: true),
+              sectionsSpace: 4,
+              sections: _buildPieChartSections(usersNumber ?? 0, activeUser ?? 0),
+            ),
           ),
         ),
-      ),
-      const SizedBox(
-        height: 32,
-      ),
-      _buildLegend(usersNumber ?? 0, activeUser ?? 0),
-    ],
+        const SizedBox(
+          height: 32,
+        ),
+        _buildLegend(usersNumber ?? 0, activeUser ?? 0),
+      ],
+    ),
   );
 }
 
@@ -259,16 +261,6 @@ Widget _buildCreateUserByDayPage(List<StatisticPoint> data) {
   );
 }
 
-Widget _buildSumOf() {
-  // Replace with actual data and UI
-  return const Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: <Widget>[
-      Text("Tổng số người dùng: 1000", style: TextStyle(fontSize: 20)),
-    ],
-  );
-}
-
 extension StatisticTypeExtension on StatisticType {
   String get label {
     switch (this) {
@@ -276,8 +268,6 @@ extension StatisticTypeExtension on StatisticType {
         return "Người dùng đang hoạt động";
       case StatisticType.userCreatedByTime:
         return "Tài khoản tạo mới";
-      case StatisticType.sumOfGroupChat:
-        return "Nhóm chat";
     }
   }
 
@@ -288,8 +278,6 @@ extension StatisticTypeExtension on StatisticType {
         return _buildSumOfActiveUserPage(totalUsers, activeUsers);
       case StatisticType.userCreatedByTime:
         return _buildCreateUserByDayPage(dataUserCreate ?? []);
-      case StatisticType.sumOfGroupChat:
-        return _buildSumOf();
     }
   }
 }

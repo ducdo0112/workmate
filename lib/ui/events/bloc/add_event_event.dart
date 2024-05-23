@@ -95,3 +95,9 @@ class AddOrUpdateEvent extends AddEventEvent {
   @override
   List<Object?> get props => [];
 }
+
+class DeleteEvent extends AddEventEvent {
+  const DeleteEvent();
+  @override
+  List<Object?> get props => [];
+}

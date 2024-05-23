@@ -223,7 +223,7 @@ class _ChatGroupPageState extends State<ChatGroupPage> {
                   )
                 ],
               )
-            : Text(_getTitle()),
+            : Text(_getTitle(), style: const TextStyle(color: Colors.white),),
         backgroundColor: AppColor.orangePeel,
         actions: [
           Visibility(

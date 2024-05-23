@@ -47,7 +47,7 @@ class _MyAppState extends State<MyApp> {
             ],
             supportedLocales: S.delegate.supportedLocales,
             onGenerateRoute: AppRouting.generateRoute,
-            home: widget.hasLogin ? HomePage() : const LoginPage());
+            home: widget.hasLogin ? AdminHomePage() : const LoginPage());
       },
     );
   }

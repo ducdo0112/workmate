@@ -32,6 +32,7 @@ class AddEventBloc extends Bloc<AddEventEvent, AddEventState> {
     on<AddEventFileChanged>(_onFileSelectedChanged);
     on<AddEventTagChanged>(_onTagChanged);
     on<AddOrUpdateEvent>(_onAddOnUpdateEventPressed);
+    on<DeleteEvent>(_onDelete);
   }
 
   Future<void> _onAccountInfoFetch(
@@ -164,6 +165,12 @@ class AddEventBloc extends Bloc<AddEventEvent, AddEventState> {
     Emitter<AddEventState> emit,
   ) async {
     emit(state.copyWith(tagEdit: event.tag));
+  }
+
+  Future<void> _onDelete(DeleteEvent event, Emitter<AddEventState> emit) async {
+    print("Check eventid: ${state.eventId}");
+    fireStoreRepository.deleteEvent(id: state.eventId, dateTime: state.dateTime!);
+    emit(state.copyWith(statusRegisterOrUpdate: BlocStatus.success));
   }
 
   Future<void> _onAddOnUpdateEventPressed(
@@ -415,4 +422,6 @@ class AddEventBloc extends Bloc<AddEventEvent, AddEventState> {
 
     return true;
   }
+
+
 }

@@ -55,7 +55,7 @@ class _MessageTileState extends State<MessageTile> {
                   ? const EdgeInsets.only(left: 16)
                   : const EdgeInsets.only(right: 16),
               padding: const EdgeInsets.only(
-                  top: 17, bottom: 17, left: 20, right: 20),
+                  top: 12, bottom: 12, left: 20, right: 20),
               decoration: BoxDecoration(
                 borderRadius: widget.sentByMe
                     ? const BorderRadius.only(
@@ -79,12 +79,12 @@ class _MessageTileState extends State<MessageTile> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          widget.sender.toUpperCase(),
+                          widget.sender,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: Colors.black,
                               letterSpacing: -0.5),
                         ),
                       ],

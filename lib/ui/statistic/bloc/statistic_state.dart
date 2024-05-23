@@ -1,6 +1,6 @@
 part of 'statistic_bloc.dart';
 
-enum StatisticType { sumOfActiveUser, userCreatedByTime, sumOfGroupChat }
+enum StatisticType { sumOfActiveUser, userCreatedByTime }
 
 class StatisticState extends BaseState {
   final StatisticType? selectedType;

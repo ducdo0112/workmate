@@ -251,7 +251,6 @@ class FireStoreRepository {
     required DateTime oldDate,
   }) async {
     String dateTimeString = TimestampUtil.formatTimeDDMMYYYY(dateTime);
-    print("dongnd1 time: $dateTimeString");
 
     DocumentSnapshot documentSnapshot = await eventsCollection
         .doc(dateTimeString)
@@ -318,6 +317,18 @@ class FireStoreRepository {
 
       return newEvent.id;
     }
+  }
+
+  Future<void> deleteEvent({
+    required String id,
+    required DateTime dateTime,
+  }) async {
+    String dateTimeString = TimestampUtil.formatTimeDDMMYYYY(dateTime);
+    //Delete
+    eventsCollection
+        .doc(dateTimeString)
+        .collection("list_events")
+        .doc(id).delete();
   }
 
   //CONVERSATIONS
